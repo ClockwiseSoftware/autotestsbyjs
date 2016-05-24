@@ -13,7 +13,12 @@ npm install
 ##Run testing
 
 ```bash
-mocha index.js --opts firefox
+gulp //default firefox
+gulp firefox
+gulp chrome
+
+//ie,opera,edge,safari
+
 ```
 
 ###Structure
