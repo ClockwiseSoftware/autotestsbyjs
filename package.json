@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "preinstall": "npm install mocha -g",
+    "preinstall": "npm install -g mocha gulp-cli",
     "test": "mocha index.js"
   },
   "author": "",
@@ -15,6 +15,10 @@
   "dependencies": {
     "chai": "^3.5.0",
     "chai-webdriver": "^1.2.0",
+    "chai-webdriver-exec": "^1.0.0",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0",
+    "gulp-process-env": "0.0.1",
     "selenium-webdriver": "^2.53.2"
   }
 }

@@ -31,9 +31,7 @@ module.exports = function(app) {
                     .dom
                     .to
                     .contain
-                    .text("Clockwiser").then(function() {
-                        done();
-                    });
+                    .text("Clockwise").then(done);
 
 
             });

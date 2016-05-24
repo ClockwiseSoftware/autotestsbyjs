@@ -1,18 +1,17 @@
 'use strict';
 
-var browser = process.argv[4];
-
+var browser = process.env.browser
 
 function buildDriver() {
     var sw = require('selenium-webdriver');
     var chaiWebdriver = require('chai-webdriver');
+    var chaiWebdriverExec = require('chai-webdriver-exec');
     var chai = require('chai');
 
 
     var driver = new sw.Builder()
-        .forBrowser(browser)
+        .forBrowser(browser|| 'firefox')
         .build();
-
 
     function waiter(time) {
         var x = false;
@@ -26,6 +25,7 @@ function buildDriver() {
 
     }
 
+    chai.use(chaiWebdriverExec(driver));
     chai.use(chaiWebdriver(driver));
     return {
         driver: driver,

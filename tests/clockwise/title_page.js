@@ -26,17 +26,12 @@ module.exports = function(app) {
 
 
             it('should be Clockwise ok', function(done) {
-                var a = driver.executeAsyncScript(hello);
 
-                a.then(function() {
                     chai.expect('.logo_main')
                         .dom
                         .to
                         .contain
                         .text("Clockwise").then(done);
-                })
-
-
 
 
             });

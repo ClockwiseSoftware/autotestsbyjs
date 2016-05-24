@@ -32,12 +32,7 @@ module.exports = function(app) {
                 driver.get(URL);
                 driver.wait(waiter(1000), 1500);
 
-                driver.getTitle()
-                    .then(function(title) {
-                        chai.assert(title, 'Games');
-                        done();
-                    });
-
+                chai.expect('return document.title').exec.to.equal('Games').then(done);
 
             });
 
@@ -46,7 +41,7 @@ module.exports = function(app) {
                 var link = driver.findElement(By.tagName('a[href="/#/signup"]'));
                 link.click();
                 driver.wait(waiter(500), 1000);
-                chai.expect('.form-sign-heading').to.dom.be.text('Please sign up6').then(done);
+                chai.expect('.form-sign-heading').to.dom.be.text('Please sign up').then(done);
 
             });
 
