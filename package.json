@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "chai": "^3.5.0",
+    "chai-webdriver": "^1.2.0",
     "selenium-webdriver": "^2.53.2"
   }
 }

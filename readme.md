@@ -1,14 +1,12 @@
-#template for testing UI
+#Template for testing UI
 
 - mocha
 - chai
 - selenium-webdriver
 
-##instalation
+##Instalation
 
 ```bash
-npm install -g mocha
-
 npm install
 ```
 
@@ -29,9 +27,16 @@ mocha index.js --opts firefox
 /tests/{test_pack_name}/{test_case_name}.js - single test case
 ```
 
+
+###Generator
+`node gen.js foldername filename`
+
+it will create /tests/{foldername}/{filename}.js
+
 ###Documentation
 
-[selenium-webdriver fuctions](http://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/)
-[chai webdriver api](http://chaijs.com/plugins/chai-webdriver/)
-[chai assertions](http://chaijs.com/api/bdd/)
-[mocha docs](https://mochajs.org/)
+- [selenium-webdriver fuctions](http://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/)
+- [chai webdriver api](http://chaijs.com/plugins/chai-webdriver/)
+- [selenium drivers](https://www.npmjs.com/package/selenium-webdriver)
+- [chai assertions](http://chaijs.com/api/bdd/)
+- [mocha docs](https://mochajs.org/)
