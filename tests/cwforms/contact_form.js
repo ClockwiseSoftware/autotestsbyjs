@@ -1,6 +1,6 @@
 'use strict';
 module.exports = function(app) {
-    var isEnabled = 0;
+    var isEnabled = 1;
 
     if (isEnabled) {
         var chai = app.chai;

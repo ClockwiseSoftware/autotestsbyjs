@@ -71,11 +71,3 @@ module.exports = function(app) {
         });
     }
 };
-
-db.myCollection.update (
-   { _id: 1, mostRecentlyUsedPortMapping: { $gte: 0 } },
-   {
-     $inc: { available: -1 },
-     $push: { checkout: { by: "abc", date: new Date() } }
-   }
-)
