@@ -13,8 +13,7 @@ if (!name) {
 
 
 var path = './selenium_ide_src/';
-var dir = path + (folder || "");
-
+var dir = path + (folder  && folder + '/' || "");
 
 var fileHandler = function(file) {
     return function(err) {
@@ -32,14 +31,14 @@ fs.readFile(dir + name + '.html', 'utf8', (err, data) => {
         console.log(err);
     }
     var parsed = parser(data);
-    var m = template(parsed);
-    console.log(m);
+    var newTest = template(parsed);
+    generate(newTest);
 });
 
 
 function parser(html) {
     var content = html.replace(new RegExp('\<\!\-\-', 'g'), '<tr class="testname"><td>').replace(new RegExp('\-\-\>', 'g'), '</td></tr>');
-    
+
     var $ = cheerio.load(content);
     var testCase = {};
     testCase.testCaseName = $('title').text();
@@ -66,4 +65,38 @@ function parser(html) {
     testCase.tests = tests;
 
     return testCase;
+}
+
+
+var pathDist = './tests/';
+var dirDist = pathDist + (folder || 'selenium_ide_dist/');
+
+var fileHandler = function(file) {
+    return function(err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log(file + ' has been saved');
+    };
+};
+
+
+function generate(testFile) {
+
+    fs.exists(dirDist, function(exists) {
+        if (exists) {
+            var filename = dirDist + '/' + name + '.js';
+            fs.writeFile(filename, testFile, fileHandler(filename));
+        } else {
+            fs.mkdir(dirDist, '0755', function(err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    var filename = dirDist + '/' + name + '.js';
+                    fs.writeFile(filename, testFile, fileHandler(filename));
+                }
+            });
+        }
+    });
 }

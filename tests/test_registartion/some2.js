@@ -15,7 +15,7 @@ module.exports = function(app) {
         var seq = app.seq;
 
 
-        describe.only('Some', function() {
+        describe('Some', function() {
             this.timeout(25000);
 
             beforeEach(function() {
