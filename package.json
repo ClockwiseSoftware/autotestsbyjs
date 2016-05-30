@@ -13,9 +13,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.0-rc.5",
     "chai": "^3.5.0",
+    "chai-cheerio": "^1.0.0",
+    "chai-jquery": "^2.0.0",
     "chai-webdriver": "^1.2.0",
     "chai-webdriver-exec": "^1.0.0",
+    "cheerio": "^0.20.0",
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
     "gulp-process-env": "0.0.1",

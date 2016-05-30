@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+    <head profile="http://selenium-ide.openqa.org/profiles/test-case">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="selenium.base" href="http://next.clockwisesoftware.com/" />
+        <title>New Test</title>
+    </head>
+
+    <body>
+        <table cellpadding="1" cellspacing="1" border="1">
+            <thead>
+                <tr>
+                    <td rowspan="1" colspan="3">New Test</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!--verify Title "Clockwise - Web and Mobile Apps Development Company"-->
+                <tr>
+                    <td>open</td>
+                    <td>http://clockwisesoftware.com</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>verifyTitle</td>
+                    <td>Clockwise - Web and Mobile Apps Development Company</td>
+                    <td></td>
+                </tr>
+                <!--verify link with text "Contact" present-->
+                <tr>
+                    <td>verifyText</td>
+                    <td>link=Contact</td>
+                    <td>Contact</td>
+                </tr>
+                <!--verify link "Contact"-->
+                <tr>
+                    <td>click</td>
+                    <td>link=Contact</td>
+                    <td></td>
+                </tr>
+                <!--verify text "Contact us"-->
+                <tr>
+                    <td>verifyText</td>
+                    <td>//section[@id='contact']/div/h2</td>
+                    <td>Contact us</td>
+                </tr>
+                <!--verify is input field "Name" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>id=name</td>
+                    <td></td>
+                </tr>
+                <!--verify is input field "Email" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>id=email</td>
+                    <td></td>
+                </tr>
+                <!--verify is input field "Phone" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>id=phone</td>
+                    <td></td>
+                </tr>
+                <!--verify is input field "Website" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>id=website</td>
+                    <td></td>
+                </tr>
+                <!--verify is input field "Message" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>name=message</td>
+                    <td></td>
+                </tr>
+                <!--verify is button "Send Message" present-->
+                <tr>
+                    <td>verifyElementPresent</td>
+                    <td>css=button.btn.btn_shadow</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>verifyText</td>
+                    <td>css=button.btn.btn_shadow</td>
+                    <td>Send Message</td>
+                </tr>
+                <!--set "Name" field-->
+                <tr>
+                    <td>sendKeys</td>
+                    <td>id=name</td>
+                    <td>Test_name</td>
+                </tr>
+                <!--set "Email" field-->
+                <tr>
+                    <td>sendKeys</td>
+                    <td>id=email</td>
+                    <td>Test_name@gmail.com</td>
+                </tr>
+                <!--set "Phone" field-->
+                <tr>
+                    <td>sendKeys</td>
+                    <td>id=phone</td>
+                    <td>7856-8345-692</td>
+                </tr>
+                <!--set "Website" field-->
+                <tr>
+                    <td>sendKeys</td>
+                    <td>id=website</td>
+                    <td>testsite.com</td>
+                </tr>
+                <!--set "Message" field-->
+                <tr>
+                    <td>sendKeys</td>
+                    <td>name=message</td>
+                    <td>Test, test, test, test, test, test, test, test, test, test, test.</td>
+                </tr>
+                <!--submit the form-->
+                <tr>
+                    <td>click</td>
+                    <td>css=button.btn.btn_shadow</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+
+</html>

@@ -1,6 +1,6 @@
 'use strict';
 
-var browser = process.env.browser
+var browser = process.env.browser;
 
 function buildDriver() {
     var sw = require('selenium-webdriver');
