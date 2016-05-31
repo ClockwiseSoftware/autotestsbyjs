@@ -119,9 +119,9 @@ function Parser(name, folder) {
     function generateListOfCommands(testCase) {
         var tests = testCase.tests;
         var filtered = _.chain(tests).map(el => el.command).uniq();
-        var commandNames = filtered.value().join('\n');
-        var commands = filtered.map(el => 'cmd.' +el +'("target", "value").wait(1000).end(done)').value().join('\n');
-        fs.writeFile(pathNode.join(__dirname, '..', 'commandList.txt'), '==LIST OF COMMAND NAMES==\n\n'+commandNames + '\n\n\n' + '==LIST OF COMMANDS==\n\n' +commands, function(err) {
+        var commandNames = filtered.map(el => '- '+el).value().join('\n');
+        var commands = filtered.map(el => '- cmd.' +el +'("target", "value").wait(1000).end(done)').value().join('\n');
+        fs.writeFile(pathNode.join(__dirname, '..', 'commandList.md'), '#LIST OF COMMAND NAMES\n\n'+commandNames + '\n\n\n' + '#LIST OF COMMANDS\n\n' +commands, function(err) {
             if (err) {
                 console.log(err);
                 return;
