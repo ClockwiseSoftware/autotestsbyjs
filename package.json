@@ -8,7 +8,7 @@
   },
   "scripts": {
     "preinstall": "npm install -g mocha gulp-cli",
-    "test": "mocha index.js"
+    "test": "gulp"
   },
   "author": "",
   "license": "ISC",
@@ -27,10 +27,8 @@
     "gulp-mocha": "^2.2.0",
     "gulp-open": "^2.0.0",
     "gulp-process-env": "0.0.1",
+    "lodash": "^4.13.1",
+    "mochawesome": "^1.3.5",
     "selenium-webdriver": "^2.53.2"
-  },
-  "devDependencies": {
-    "gulp-live-server": "0.0.29",
-    "mochawesome": "^1.3.5"
   }
 }

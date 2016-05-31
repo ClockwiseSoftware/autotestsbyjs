@@ -1,65 +1,0 @@
-[20:44:23] Using gulpfile ~/server/testing/gulpfile.js
-[20:44:23] Starting 'chrome'...
--- INCLUDE "./tests/selenium_ide_dist/some_test
--- INCLUDE "./tests/some_folder/some_test
--- INCLUDE "./tests/test_registartion/some2
-
-
-  New Test
-    ✓ - verify Title "Clockwise - Web and Mobile Apps Development Company" (4475ms)
-    ✓ - verify link with text "Contact" present
-    ✓ - verify link "Contact" (62ms)
-    ✓ - verify text "Contact us" (86ms)
-    ✓ - verify is input field "Name" present
-    ✓ - verify is input field "Email" present (47ms)
-    ✓ - verify is input field "Phone" present (50ms)
-    ✓ - verify is input field "Website" present
-    ✓ - verify is input field "Message" present (38ms)
-    ✓ - verify is button "Send Message" present (59ms)
-    ✓ - set "Name" field (93ms)
-    ✓ - set "Email" field (121ms)
-    ✓ - set "Phone" field (113ms)
-    ✓ - set "Website" field (104ms)
-    ✓ - set "Message" field (162ms)
-    ✓ - submit the form (108ms)
-
-  New Test
-    ✓ - verify Title "Clockwise - Web and Mobile Apps Development Company" (3107ms)
-    ✓ - verify link with text "Contact" present
-    ✓ - verify link "Contact" (51ms)
-    ✓ - verify text "Contact us"
-    ✓ - verify is input field "Name" present
-    ✓ - verify is input field "Email" present
-    ✓ - verify is input field "Phone" present
-    ✓ - verify is input field "Website" present
-    ✓ - verify is input field "Message" present
-    ✓ - verify is button "Send Message" present (63ms)
-    ✓ - set "Name" field (120ms)
-    ✓ - set "Email" field (139ms)
-    ✓ - set "Phone" field (94ms)
-    ✓ - set "Website" field (98ms)
-    ✓ - set "Message" field (174ms)
-    ✓ - submit the form (85ms)
-
-  Some
-    ✓ - verify Title "Clockwise - Web and Mobile Apps Development Company" (2892ms)
-    ✓ - verify link with text "Contact" present
-    ✓ - verify link "Contact" (51ms)
-    ✓ - verify text "Contact us" (48ms)
-    ✓ - verify is input field "Name" present
-    ✓ - verify is input field "Email" present (39ms)
-    ✓ - verify is input field "Phone" present
-    ✓ - verify is input field "Website" present
-    ✓ - verify is input field "Message" present
-    ✓ - verify is button "Send Message" present (38ms)
-    ✓ - set "Name" field (131ms)
-    ✓ - set "Email" field (193ms)
-    ✓ - set "Phone" field (94ms)
-    ✓ - set "Website" field (88ms)
-    ✓ - set "Message" field (166ms)
-    ✓ - submit the form (242ms)
-
-
-  48 passing (14s)
-
-[20:44:37] Finished 'chrome' after 14 s
