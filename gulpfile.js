@@ -7,8 +7,11 @@ var openBrowser = require('gulp-open');
 var parser = require('./parser/parser');
 
 function testRunner(browser) {
+    var speed = args.speed || null;
+    var width = args.w || null;
+    var heigth = args.h || null;
     return function(done) {
-        var env = processEnv({ browser: browser });
+        var env = processEnv({ browser: browser, speed: speed, windowWidth: width, windowHeigth: heigth });
         return gulp.src('index.js', {
                 read: false
             })

@@ -47,7 +47,7 @@ module.exports = function(app) {
     function close() {
         return buildHelpers((cb) => {
             return driver.close().then(e(cb));
-        });
+        }, true);
 
     }
 

@@ -4,6 +4,11 @@
         var driver = app.driver;
         var By = app.By;
         var waiter = app.waiter;
+        var averageTime = app.speed;
+        if (averageTime > 10000) {
+            averageTime = 10000;
+        }
+
         return {
             end: end,
             e: e,
@@ -15,10 +20,18 @@
 
 
 
-        function end(method) {
+
+        function end(method, isUsedWait) {
             return {
                 end: function(done) {
-                    method(done);
+                    if (averageTime && !isUsedWait) {
+                        wait(averageTime)(function() {
+                            method(done);
+                        });
+                    } else {
+                        method(done);
+                    }
+
                 }
             };
         }
@@ -36,15 +49,15 @@
             };
         }
 
-        function buildHelpers(method) {
+        function buildHelpers(method, notUseWaiter) {
             return {
                 wait: function(time) {
                     return end(function(done) {
                         wait(time)(done);
-                    });
+                    }, true);
 
                 },
-                end: end(method).end
+                end: end(method, notUseWaiter).end
             };
         }
 
