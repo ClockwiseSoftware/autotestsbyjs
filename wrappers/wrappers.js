@@ -16,6 +16,7 @@ module.exports = function(app) {
         open: open,
         close: close,
         click: click,
+        wait: wait,
         sendKeys: sendKeys,
         verifyTitle: verifyTitle,
         verifyElementPresent: verifyElementPresent,
@@ -23,11 +24,6 @@ module.exports = function(app) {
     };
 
 
-    function run(flow) {
-        this.flow = flow;
-        return this;
-
-    }
 
     function end(method) {
         return {
@@ -37,13 +33,19 @@ module.exports = function(app) {
         };
     }
 
+    function wait(time) {
+        time = time || 2000;
+        return this.end((cb) => {
+            return driver.wait(waiter(time), +time + 500).then(e(cb));
+        });
+    }
+
     function open(url, time) {
         time = time || 2000;
 
         return this.end((cb) => {
             return driver.get(url).then(() => {
-                return driver.wait(waiter(time), +time + 500).then(e(cb));
-
+                return wait(time).end(cb);
             });
 
         });
@@ -66,9 +68,15 @@ module.exports = function(app) {
 
 
 
-    function verifyTitle(expectedTitle) {
+    function verifyTitle(expectedTitle, time) {
         return this.end((cb) => {
-            return chai.expect('return document.title').exec.to.equal(expectedTitle).then(e(cb));
+            var promise = chai.expect('return document.title').exec.to.equal(expectedTitle);
+            if (time) {
+                return promise.then(()=>{
+                    return wait(time).end(cb);
+                });
+            }
+            return promise.then(e(cb));
         });
     }
 

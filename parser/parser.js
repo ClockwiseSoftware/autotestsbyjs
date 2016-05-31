@@ -4,6 +4,7 @@ function Parser(name, folder) {
     var template = require('./template');
     var fsops = require('../fsops');
     var pathNode = require('path');
+    var async = require('async');
 
     var pathSrc = pathNode.join(__dirname, '..', 'selenium_ide_src');
     var pathDist = pathNode.join(__dirname, '..', 'tests');
@@ -17,8 +18,13 @@ function Parser(name, folder) {
 
     if (!name) {
         var files = fsops.filepathGetter(dirSrc);
-        (files || []).forEach(function(file) {
-            readAndGenerate(file);
+        async.eachSeries((files || []), function(file, done) {
+            readAndGenerate(file, done);
+        }, function(err) {
+            if (err) {
+                console.log(err);
+                return;
+            }
         });
     } else {
         readAndGenerate(pathNode.join(dirSrc, name + '.html'));
@@ -26,23 +32,23 @@ function Parser(name, folder) {
 
 
 
-    function readAndGenerate(file) {
+    function readAndGenerate(file, done) {
         var name = fsops.getModuleName(file, 1);
         var includedDir = file.replace(dirSrc, '').replace(name, '');
         var isIncluded = includedDir.replace('/', '').length;
         var dest = dirDest;
-        if(isIncluded){
+        if (isIncluded) {
             dest = pathNode.join(dest, includedDir);
         }
 
-       
+
         fs.readFile(file, 'utf8', (err, data) => {
             if (err) {
                 console.log(err);
             }
             var parsed = parser(data);
             var newTest = template(parsed);
-            generate(newTest, name.replace('.html',''), dest);
+            generate(newTest, name.replace('.html', ''), dest, done);
         });
     }
 
@@ -75,29 +81,33 @@ function Parser(name, folder) {
 
 
 
-    function fileHandler(file) {
+    function fileHandler(file, done) {
         return function(err) {
             if (err) {
-                console.log(err);
+                console.trace(err);
                 return;
             }
+
             console.log(file + ' has been saved');
+            if (done) {
+                done();
+            }
         };
     }
 
-    function generate(testFile, name, dest) {
-
+    function generate(testFile, name, dest, done) {
+        name = name.replace(new RegExp('\ ', 'g'), '_');
         fs.exists(dest, function(exists) {
             if (exists) {
                 var filename = dest + '/' + name + '.js';
-                fs.writeFile(filename, testFile, fileHandler(filename));
+                fs.writeFile(filename, testFile, fileHandler(filename, done));
             } else {
                 fs.mkdir(dest, '0755', function(err) {
                     if (err) {
-                        console.log(err);
+                        console.trace(err);
                     } else {
                         var filename = dest + '/' + name + '.js';
-                        fs.writeFile(filename, testFile, fileHandler(filename));
+                        fs.writeFile(filename, testFile, fileHandler(filename, done));
                     }
                 });
             }
