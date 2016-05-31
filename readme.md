@@ -3,6 +3,7 @@
 - mocha
 - chai
 - selenium-webdriver
+- node.js
 
 ##Instalation
 
