@@ -12,7 +12,6 @@ module.exports = function(app) {
 
     return {
         flow: [],
-        run: run,
         end: end,
         open: open,
         close: close,
@@ -30,32 +29,32 @@ module.exports = function(app) {
 
     }
 
-    function end(done) {
-        async.waterfall(this.flow, function(err, res) {
-            if (err) {
-                return done(err);
+    function end(method) {
+        return {
+            end: function(done) {
+                method(done);
             }
-            done();
-        });
+        };
     }
 
     function open(url, time) {
         time = time || 2000;
-        return (cb) => {
+
+        return this.end((cb) => {
             return driver.get(url).then(() => {
                 return driver.wait(waiter(time), +time + 500).then(e(cb));
 
             });
 
-        };
+        });
 
     }
 
     function close() {
-        return (cb) => {
+        return this.end((cb) => {
             return driver.close().then(e(cb));
 
-        };
+        });
 
     }
 
@@ -68,9 +67,9 @@ module.exports = function(app) {
 
 
     function verifyTitle(expectedTitle) {
-        return (cb) => {
+        return this.end((cb) => {
             return chai.expect('return document.title').exec.to.equal(expectedTitle).then(e(cb));
-        };
+        });
     }
 
     function getRulesType(target) {
@@ -110,7 +109,7 @@ module.exports = function(app) {
 
 
     function verifyText(target, value) {
-        return (cb) => {
+        return this.end((cb) => {
             var by = getBy(target);
             if (!by) {
                 return cb();
@@ -123,42 +122,42 @@ module.exports = function(app) {
                     chai.assert.equal(text, value);
                     cb();
                 });
-        };
+        });
 
     }
 
     function verifyElementPresent(target) {
-        return (cb) => {
+        return this.end((cb) => {
             var by = getBy(target);
             if (!by) {
                 return cb();
             }
             return driver.isElementPresent(by(target)).then(e(cb));
-        };
+        });
 
     }
 
     function click(target) {
-        return (cb) => {
+        return this.end((cb) => {
             var by = getBy(target);
             if (!by) {
                 return cb();
             }
             return driver.findElement(by(target)).click().then(e(cb));
 
-        };
+        });
 
     }
 
     function sendKeys(target, value) {
-        return (cb) => {
+        return this.end((cb) => {
             var by = getBy(target);
             if (!by) {
                 return cb();
             }
             return driver.findElement(by(target)).sendKeys(value).then(e(cb));
 
-        };
+        });
 
     }
 
