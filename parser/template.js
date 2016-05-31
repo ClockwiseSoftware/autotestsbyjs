@@ -19,7 +19,7 @@
       var headTemplate = [
           "'use strict';",
           "module.exports = function(app) {",
-          "    var isEnabled = 1;",
+          "    var isEnabled = 0;",
           "",
           "    if (isEnabled) {",
           "",
@@ -66,10 +66,17 @@
       var compiledHead = _.template(headTemplate);
       var timeout = data.tests.length * 1000;
 
+      function escape(string){
+        return string
+        .replace(new RegExp("\'", 'g'), '\\\'')
+        .replace(new RegExp("\"", 'g'), '\\\"')
+        .replace(new RegExp("\/", 'g'), '\/');
+      }
+
       var tests = data.tests.map((test, i) => {
           var command = test.command;
-          var target = test.target.replace(new RegExp("\'", 'g'), '\\\'');
-          var value = test.value && test.value.replace(new RegExp("\'", 'g'), '\\\'') || '';
+          var target = escape(test.target);
+          var value = test.value && escape(test.value) || '';
 
           var unitTemplate = 'cmd.{{command}}("{{target}}"{{value}}).end(done);';
           var unitCompiled = _.template(unitTemplate);
