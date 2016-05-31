@@ -5,6 +5,7 @@ function Parser(name, folder) {
     var fsops = require('../fsops');
     var pathNode = require('path');
     var async = require('async');
+    var _ = require('lodash');
 
     var pathSrc = pathNode.join(__dirname, '..', 'selenium_ide_src');
     var pathDist = pathNode.join(__dirname, '..', 'tests');
@@ -48,6 +49,7 @@ function Parser(name, folder) {
             }
             var parsed = parser(data);
             var newTest = template(parsed);
+            generateListOfCommands(parsed);
             generate(newTest, name.replace('.html', ''), dest, done);
         });
     }
@@ -111,6 +113,20 @@ function Parser(name, folder) {
                     }
                 });
             }
+        });
+    }
+
+    function generateListOfCommands(testCase) {
+        var tests = testCase.tests;
+        var filtered = _.chain(tests).map(el => el.command).uniq();
+        var commandNames = filtered.value().join('\n');
+        var commands = filtered.map(el => 'cmd.' +el +'("target", "value").wait(1000).end(done)').value().join('\n');
+        fs.writeFile(pathNode.join(__dirname, '..', 'commandList.txt'), '==LIST OF COMMAND NAMES==\n\n'+commandNames + '\n\n\n' + '==LIST OF COMMANDS==\n\n' +commands, function(err) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log('Command list created');
         });
     }
 
