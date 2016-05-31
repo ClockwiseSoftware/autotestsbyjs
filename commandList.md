@@ -10,9 +10,26 @@
 
 #LIST OF COMMANDS
 
-- cmd.verifyElementPresent("target", "value").wait(1000).end(done)
-- cmd.storeText("target", "value").wait(1000).end(done)
-- cmd.echo("target", "value").wait(1000).end(done)
-- cmd.storeEval("target", "value").wait(1000).end(done)
-- cmd.verifyText("target", "value").wait(1000).end(done)
-- cmd.verifyVisible("target", "value").wait(1000).end(done)
+```js
+cmd.verifyElementPresent("target", "value").wait(1000).end(done);
+```
+
+```js
+cmd.storeText("target", "value").wait(1000).end(done);
+```
+
+```js
+cmd.echo("target", "value").wait(1000).end(done);
+```
+
+```js
+cmd.storeEval("target", "value").wait(1000).end(done);
+```
+
+```js
+cmd.verifyText("target", "value").wait(1000).end(done);
+```
+
+```js
+cmd.verifyVisible("target", "value").wait(1000).end(done);
+```
