@@ -79,6 +79,7 @@
         }
 
 
+
         function ByLink(target) {
             target = target.replace('link=', '');
             return By.xpath('//a[text()="' + target + '"]');

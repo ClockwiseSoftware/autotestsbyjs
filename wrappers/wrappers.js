@@ -9,6 +9,7 @@ module.exports = function(app) {
     var helpers = require('../helpers')(app);
     var end = helpers.end;
     var buildHelpers = helpers.buildHelpers;
+    var isBy = helpers.isBy;
     var getBy = helpers.getBy;
     var e = helpers.e;
     var wait = helpers.wait;
@@ -24,6 +25,7 @@ module.exports = function(app) {
         wait: wait,
         sendKeys: sendKeys,
         verifyTitle: verifyTitle,
+        verifyAttribute: verifyAttribute,
         verifyElementPresent: verifyElementPresent,
         verifyText: verifyText
     };
@@ -73,6 +75,34 @@ module.exports = function(app) {
                     chai.assert.equal(text, value);
                     cb();
                 });
+        });
+
+    }
+    //target id=email@placeholder
+    function verifyAttribute(target, value) {
+
+        return buildHelpers((cb) => {
+            var parts = target.split('@'); 
+
+            var target_locator = parts[0];
+            var attribute = parts[1];
+            var by = getBy(target);
+
+            return driver.findElement(by(target_locator))
+                .then(function(el) {
+                    return el.getAttribute(attribute);
+                })
+                .then((attribute) => {
+                    if(!attribute){
+                        return cb(new Error('attribute not found'));
+                    }
+                    chai.assert.equal(attribute, value);
+                    cb();
+                })
+                .catch(function(error) {
+                    cb(error);
+                });
+
         });
 
     }
