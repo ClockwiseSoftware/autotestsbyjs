@@ -7,11 +7,28 @@ var openBrowser = require('gulp-open');
 var parser = require('./parser/parser');
 
 function testRunner(browser) {
-    var speed = args.speed || null;
-    var width = args.w || null;
-    var heigth = args.h || null;
+    var speed = args.speed;
+    var width = args.ww;
+    var heigth = args.wh;
+    var envObject = {
+        browser: browser
+    };
+
+    if (width) {
+        envObject.windowWidth = width;
+    }
+
+    if (heigth) {
+        envObject.windowHeigth = heigth;
+    }
+
+
+    if (speed) {
+        envObject.speed = speed;
+    }
+
     return function(done) {
-        var env = processEnv({ browser: browser, speed: speed, windowWidth: width, windowHeigth: heigth });
+        var env = processEnv(envObject);
         return gulp.src('index.js', {
                 read: false
             })

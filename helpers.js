@@ -1,4 +1,6 @@
     var _ = require('lodash');
+    var storedVarsPattern = /\${([\s\S]+?)}/g;
+    _.templateSettings.interpolate = storedVarsPattern;
 
     module.exports = function(app) {
         var driver = app.driver;
@@ -14,10 +16,34 @@
             e: e,
             buildHelpers: buildHelpers,
             getBy: getBy,
+            checkElement: checkElement,
+            parseStoredVars: parseStoredVars,
+            errorHandler: errorHandler,
             wait: wait
         };
 
+        function errorHandler(cb) {
+            return function(error) {
+                return cb(error);
+            };
+        }
 
+        function checkElement(cb) {
+            return function(el) {
+                if (!el) {
+                    return Promise.reject(new Error('element not found'));
+                }
+                return cb(el);
+            };
+        }
+
+        function parseStoredVars(value, vars) {
+            if (storedVarsPattern.test(value)) {
+                var parsed = _.template(value);
+                return parsed(vars);
+            }
+            return value;
+        }
 
 
 
@@ -52,6 +78,7 @@
         function buildHelpers(method, notUseWaiter) {
             return {
                 wait: function(time) {
+                    console.log('==========\n', time, '\n==========');
                     return end(function(done) {
                         wait(time)(done);
                     }, true);
@@ -99,6 +126,7 @@
             target = target.replace('name=', '');
             return By.name(target);
         }
+
 
         function ByXpath(target) {
             return By.xpath(target);

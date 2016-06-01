@@ -15,7 +15,8 @@ function buildDriver() {
     var driver = new sw.Builder()
         .forBrowser(browser || 'firefox')
         .build();
-    if (windowWidth) {
+
+    if (!!windowWidth) {
         if (windowHeigth) {
             windowHeigth = Math.floor(windowWidth / 1.7777777777777777);
         }
