@@ -1,4 +1,4 @@
-function Parser(name, folder) {
+function Parser(name, folder, isSuite) {
     var fs = require('fs');
     var cheerio = require('cheerio');
     var template = require('./template');
@@ -6,28 +6,58 @@ function Parser(name, folder) {
     var pathNode = require('path');
     var async = require('async');
     var _ = require('lodash');
+    var commandList = [];
 
     var pathSrc = pathNode.join(__dirname, '..', 'selenium_ide_src');
     var pathDist = pathNode.join(__dirname, '..', 'tests');
+
+    var pathSuitesSrc = pathNode.join(__dirname, '..', 'selenium_ide_suites');
+    var pathSuitesDest = pathNode.join(__dirname, '..', 'suites');
+
     var dirSrc = pathSrc;
     var dirDest = pathDist;
+
+    var dirSuitesSrc = pathSuitesSrc;
+    var dirSuitesDest = pathSuitesDest;
 
     if (folder) {
         dirSrc = pathNode.join(dirSrc, folder);
         dirDest = pathNode.join(dirDest, folder);
+
+        dirSuitesSrc = pathNode.join(dirSuitesSrc, folder);
+        dirSuitesDest = pathNode.join(dirSuitesDest, folder);
     }
 
     if (!name) {
+        isSuite = true;
+        var filesSuites = fsops.filepathGetter(dirSuitesSrc);
         var files = fsops.filepathGetter(dirSrc);
-        async.eachSeries((files || []), function(file, done) {
+
+        async.eachSeries((filesSuites || []), function(file, done) {
             readAndGenerate(file, done);
         }, function(err) {
             if (err) {
                 console.log(err);
                 return;
             }
+            isSuite = false;
+            async.eachSeries((files || []), function(file, done) {
+                readAndGenerate(file, done);
+            }, function(err) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                generateListOfCommands(commandList);
+            });
         });
+
     } else {
+        if (isSuite) {
+            readAndGenerate(pathNode.join(pathSuitesDest, name + '.html'));
+        } else {
+            readAndGenerate(pathNode.join(dirSrc, name + '.html'));
+        }
         readAndGenerate(pathNode.join(dirSrc, name + '.html'));
     }
 
@@ -35,29 +65,34 @@ function Parser(name, folder) {
 
     function readAndGenerate(file, done) {
         var name = fsops.getModuleName(file, 1);
-        var includedDir = file.replace(dirSrc, '').replace(name, '');
+        var includedDir = file.replace(isSuite ? dirSuitesSrc : dirSrc, '').replace(name, '');
         var isIncluded = includedDir.replace('/', '').length;
-        var dest = dirDest;
+        var dest = isSuite ? dirSuitesDest : dirDest;
+
         if (isIncluded) {
             dest = pathNode.join(dest, includedDir);
         }
+        //console.log(name, includedDir, dest);
 
 
         fs.readFile(file, 'utf8', (err, data) => {
             if (err) {
                 console.log(err);
             }
-            var parsed = parser(data);
-            var newTest = template(parsed);
-            generateListOfCommands(parsed);
+            var parsed = isSuite ? parserSuites(data, name, dest) : parserTests(data);
+            var newTest = isSuite ? template.suites(parsed) : template.tests(parsed);
+            if (!isSuite) {
+                commandList = commandList.concat(parsed.tests);
+            }
             generate(newTest, name.replace('.html', ''), dest, done);
         });
     }
 
-    function parser(html) {
+    function parserTests(html) {
         var $ = cheerio.load(html);
         var testCase = {};
         testCase.testCaseName = $('title').text();
+        testCase.baseUrl = $('link[rel="selenium.base"]').attr('href') || "";
 
         var tr = $('tbody > tr');
 
@@ -75,6 +110,33 @@ function Parser(name, folder) {
 
         });
         testCase.tests = tests;
+
+        return testCase;
+    }
+
+    function parserSuites(html, suiteName, dest) {
+
+        var $ = cheerio.load(html);
+        var testCase = {};
+        testCase.suiteName = suiteName;
+
+        var tr = $('tbody > tr');
+
+        var suites = [];
+        tr.each((i, el) => {
+            var a = $(el).find('td > a');
+
+
+
+            var testName = $(a).eq(0).text();
+            if (!testName) {
+                return;
+            }
+            suites.push(pathNode.join(dest, testName));
+
+
+        });
+        testCase.suites = suites;
 
         return testCase;
     }
@@ -99,6 +161,7 @@ function Parser(name, folder) {
 
     function generate(testFile, name, dest, done) {
         name = name.replace(new RegExp('\ ', 'g'), '_');
+        console.log(name, dest);
         fs.exists(dest, function(exists) {
             if (exists) {
                 var filename = dest + '/' + name + '.js';
@@ -116,12 +179,12 @@ function Parser(name, folder) {
         });
     }
 
-    function generateListOfCommands(testCase) {
-        var tests = testCase.tests;
+    function generateListOfCommands(commandList) {
+        var tests = commandList;
         var filtered = _.chain(tests).map(el => el.command).uniq();
-        var commandNames = filtered.map(el => '- '+el).value().join('\n');
-        var commands = filtered.map(el => '```js\ncmd.' +el +'("target", "value").wait(1000).end(done);\n```\n').value().join('\n');
-        fs.writeFile(pathNode.join(__dirname, '..', 'commandList.md'), '#LIST OF COMMAND NAMES\n\n'+commandNames + '\n\n\n' + '#LIST OF COMMANDS\n\n' +commands, function(err) {
+        var commandNames = filtered.map(el => '- ' + el).value().join('\n');
+        var commands = filtered.map(el => '```js\ncmd.' + el + '("target", "value").end(done);\n```\n').value().join('\n');
+        fs.writeFile(pathNode.join(__dirname, '..', 'commandList.md'), '#LIST OF COMMAND NAMES\n\n' + commandNames + '\n\n\n' + '#LIST OF COMMANDS\n\n' + commands, function(err) {
             if (err) {
                 console.log(err);
                 return;

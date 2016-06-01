@@ -21,7 +21,9 @@ module.exports = function(app) {
 
     return {
         flow: [],
+        storedVars: {},
         end: end,
+        setBaseUrl: setBaseUrl,
         open: open,
         close: close,
         click: click,
@@ -36,18 +38,54 @@ module.exports = function(app) {
         storeText: storeText,
         waitForElementPresent: waitForElementPresent,
         store: store,
-        storedVars: {}
+
+
+        verifyVisible: verifyVisible,
+        doubleClickAt: doubleClickAt,
+        waitForPageToLoad: waitForPageToLoad,
+        verifyAttribute: verifyAttribute,
+        storeExpression: storeExpression,
+        select: select,
+        pause: pause,
+        verifyValue: verifyValue,
+        typeKeys: typeKeys,
+        assertText: assertText,
+        storeCssCount: storeCssCount,
+        clickAndWait: clickAndWait,
+        verifyChecked: verifyChecked,
+        storeSelectOptions: storeSelectOptions,
+        assertValue: assertValue,
+        verifySelectOptions: verifySelectOptions,
+        verifySelectedLabel: verifySelectedLabel,
+        verifyNotText: verifyNotText,
+        focus: focus,
+        selectWindow: selectWindow,
+        verifyNotVisible: verifyNotVisible,
+        verifyNotEditable: verifyNotEditable,
+        storeValue: storeValue,
+        setSpeed: setSpeed,
+        mouseOver: mouseOver,
+        runScript: runScript,
+        verifyNotAttribute: verifyNotAttribute,
+        getEval: getEval,
+        verifyEval: verifyEval,
+        mouseOut: mouseOut,
+        verifyLocation: verifyLocation,
+        verifyElementNotPresent: verifyElementNotPresent,
+        waitForText: waitForText,
+        goBackAndWait: goBackAndWait
     };
 
-
-
-
+    function setBaseUrl(url) {
+        this.baseUrl = url || '';
+    }
 
     function open(url, time) {
         time = time || 2000;
+        var baseUrl = this.baseUrl || '';
 
         return buildHelpers((cb) => {
-            return driver.get(url).then(() => {
+            return driver.get(baseUrl + url).then(() => {
                 return wait(time)(cb);
             });
 
@@ -63,7 +101,7 @@ module.exports = function(app) {
     }
 
 
-    function verifyTitle(expectedTitle) {
+    function verifyTitle() {
         return buildHelpers((cb) => {
             return driver.getTitle().then(e(cb));
         });
@@ -153,7 +191,7 @@ module.exports = function(app) {
     }
 
     function type(target, value) {
-        console.log('==========\n', this.storedVars,'\n==========');
+        console.log('==========\n', this.storedVars, '\n==========');
         value = parseStoredVars(value, this.storedVars);
         return buildHelpers((cb) => {
             var by = getBy(target);
@@ -210,5 +248,259 @@ module.exports = function(app) {
         });
 
     }
+
+
+
+
+
+
+
+
+
+    function verifyVisible() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function doubleClickAt() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function waitForPageToLoad() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyAttribute() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function storeExpression() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function select() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function pause() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyValue() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function typeKeys() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function assertText() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function storeCssCount() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function clickAndWait() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyChecked() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function storeSelectOptions() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function assertValue() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifySelectOptions() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifySelectedLabel() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyNotText() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function focus() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function selectWindow() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyNotVisible() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyNotEditable() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function storeValue() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function setSpeed() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function mouseOver() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function runScript() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyNotAttribute() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function getEval() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyEval() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function mouseOut() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyLocation() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function verifyElementNotPresent() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function waitForText() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+    function goBackAndWait() {
+        return buildHelpers((cb) => {
+            return cb();
+        });
+
+    }
+
+
+
+
+
+
+
+
 
 };
