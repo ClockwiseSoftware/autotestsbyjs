@@ -53,6 +53,7 @@ module.exports = function(app) {
         storeSelectOptions: storeSelectOptions,
         storeText: storeText,
         storeValue: storeValue,
+        selectFrame: selectFrame,
         type: type,
         typeKeys: typeKeys,
         verifyAttribute: verifyAttribute,
@@ -82,6 +83,7 @@ module.exports = function(app) {
     }
 
     function open(url, time) {
+        url = parseStoredVars(url, this.storedVars);
         time = time || 2000;
         var baseUrl = this.baseUrl || '';
 
@@ -495,6 +497,16 @@ module.exports = function(app) {
     }
 
     function selectWindow() {
+        if (finishTest) {
+            return finish();
+        }
+        return buildHelpers((cb) => {
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+        });
+
+    } 
+
+    function selectFrame() {
         if (finishTest) {
             return finish();
         }

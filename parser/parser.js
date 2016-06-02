@@ -75,7 +75,7 @@ function Parser(name, folder, isSuite) {
             if (err) {
                 console.log(err);
             }
-            var parsed = isSuite ? parserSuites(data, name, destTest) : parserTests(data, _.snakeCase(name.replace('.html', '')) + '.js');
+            var parsed = isSuite ? parserSuites(data, name, destTest) : parserTests(data, snakeCase(name.replace('.html', '')) + '.js');
             var newTest = isSuite ? template.suites(parsed) : template.tests(parsed);
             if (!isSuite) {
                 commandList = commandList.concat(parsed.tests);
@@ -119,7 +119,7 @@ function Parser(name, folder, isSuite) {
 
         var $ = cheerio.load(html);
         var testCase = {};
-        testCase.suiteName = _.snakeCase(suiteName.replace('.html', '')) + '.js';
+        testCase.suiteName = snakeCase(suiteName.replace('.html', '')) + '.js';
 
         var tr = $('tbody > tr');
 
@@ -133,7 +133,7 @@ function Parser(name, folder, isSuite) {
             if (!testName) {
                 return;
             }
-            suites.push(pathNode.join(dest, _.snakeCase(testName)));
+            suites.push(pathNode.join(dest, snakeCase(testName)));
 
 
         });
@@ -159,7 +159,7 @@ function Parser(name, folder, isSuite) {
     }
 
     function generate(testFile, name, dest, done) {
-        name = _.snakeCase(name);
+        name = snakeCase(name);
         console.log(name, dest);
         fs.exists(dest, function(exists) {
             if (exists) {
@@ -214,5 +214,8 @@ if (o.name) {
     Parser(o.name, o.folder);
 }
 
+function snakeCase(value){
+    return value.replace(/\ /g, '_').replace(/\\/g,'\\\\');
+}
 
 module.exports = Parser;

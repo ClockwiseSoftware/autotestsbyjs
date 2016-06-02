@@ -3,7 +3,7 @@
   _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 function windowsPathReplace(value){
-  return value.replace(/\\/g,'\\\\').replace(/ /g, '');
+  return value.replace(/\\/g,'\\\\').replace(/ /g, '\\ ');
 }
 
   //var compiled = _.template('hello {{ user }}!');
