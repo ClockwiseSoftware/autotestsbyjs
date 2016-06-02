@@ -15,9 +15,12 @@
   function suites(data) {
       var headTemplate = [
           "'use strict';",
-          "var tests = [{{testsList}}];",
-          "module.exports = {run: run, tests: tests};",
+          "var switchers = {",
+          "{{switchers}}",
+          "};",
+          "",
           "function run(app) {",
+          "    var isNotClose = app.isNotClose;",
           "    var isEnabled = 0;",
           "",
           "    if (isEnabled) {",
@@ -35,7 +38,8 @@
           "            });",
           "",
           "            after(function(done) {",
-          "               cmd.close().end(done);",
+          "              if(isNotClose) { return done(); }",
+          "              cmd.close().end(done);",
           "            });",
           ""
       ].join('\n');
@@ -44,7 +48,7 @@
           "",
           "          try {",
           "            test['{{suiteFilePath}}'] = require('{{suiteFilePath}}');",
-          "            test['{{suiteFilePath}}'](app);",
+          "            test['{{suiteFilePath}}'](app, switchers['{{num}}']);",
           "          } ",
           "          catch(e){",
           "            console.log(e);",
@@ -52,34 +56,45 @@
           ""
       ].join('\n');
 
+      var tailTemplate = [
+          "",
+          "        });",
+          "    }",
+          "};",
+          "",
+          "var tests = [{{testsList}}];",
+          "module.exports = {run: run, tests: tests};"
+
+      ].join('\n');
+
+
+
       var compiledHead = _.template(headTemplate);
+      var compiledTail = _.template(tailTemplate);
       var timeout = data.suites.length * 100000;
 
 
-      var filePathList = data.suites.map((suiteFilePath, i) => {
-          return suiteFilePath.replace(new RegExp('\ ', 'g'), '_');
-      });
+      var filePathList = data.suites;
 
-      data.testsList = filePathList.map(el => "'" + el + "'").join(',\n');
+      data.switchers = filePathList.map((el, i) => "'" + i + "' : 1," + "\t\t\t// " + el).join(',\n');
+      var testsList = filePathList.map(el => "'" + el + "'").join(',\n');
 
-       var suites = filePathList.map((suiteFilePath, i) => {
+      var suites = filePathList.map((suiteFilePath, i) => {
           var compiled = _.template(unitTestTemplate);
           return compiled({
-              suiteFilePath: suiteFilePath
+              suiteFilePath: suiteFilePath,
+              num: i
           });
 
       });
 
+
       data.timeout = timeout;
       var head = compiledHead(data);
+      var tail = compiledTail({ testsList: testsList });
 
 
-      var tail = [
-          "",
-          "        });",
-          "    }",
-          "};"
-      ].join('\n');
+
 
       var buildedSuite = [head, suites.join('\n\n'), tail].join('\n');
       return buildedSuite;
@@ -88,8 +103,8 @@
   function tests(data) {
       var headTemplate = [
           "'use strict';",
-          "module.exports = function(app) {",
-          "    var isEnabled = 0;",
+          "module.exports = function(app, isSuiteMember) {",
+          "    var isEnabled = isSuiteMember || 0;",
           "",
           "    if (isEnabled) {",
           "",
@@ -100,7 +115,7 @@
           "        var waiter = app.waiter;",
           "        var $ = app.$;",
           "        var seq = app.seq;",
-          "        var cmd = require('../../wrappers/wrappers')(app);",
+          "        var cmd = require(app.root + '/wrappers/wrappers')(app);",
           "        var speed = app.speed || 1;",
           "        var baseUrl = \"{{baseUrl}}\";",
           "        cmd.setBaseUrl(baseUrl);",
@@ -122,7 +137,8 @@
           "            });",
           "",
           "            after(function(done) {",
-          "               cmd.close().end(done);",
+          "              if(!isSuiteMember){ return cmd.close().end(done);}",
+          "              done();",
           "            });",
           ""
       ].join('\n');

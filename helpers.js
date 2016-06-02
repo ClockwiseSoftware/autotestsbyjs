@@ -139,7 +139,7 @@
                 ByCss: /^css\=/.test(target),
                 ByName: /^name\=/.test(target),
                 ById: /^id\=/.test(target),
-                ByXpath: /^\/\//.test(target)
+                ByXpath: /^\/\//.test(target) || /^xpath=/.test(target)
             };
 
             var type = Object.keys(rules).filter(function(rule) {

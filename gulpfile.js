@@ -6,12 +6,16 @@ var args = require('get-gulp-args')();
 var openBrowser = require('gulp-open');
 var parser = require('./parser/parser');
 
+var isReport = args.report;
+
 function testRunner(browser) {
     var speed = args.speed;
     var width = args.ww;
     var heigth = args.wh;
+    var isNotClose = args.show;
     var envObject = {
-        browser: browser
+        browser: browser,
+        isNotClose: isNotClose
     };
 
     if (width) {
@@ -37,11 +41,12 @@ function testRunner(browser) {
                 reporter: 'mochawesome'
             }))
             .on('end', function() {
-
-                return gulp
-                    .src('./mochawesome-reports/mochawesome.html')
-                    .pipe(openBrowser())
-                    .on('end', done);
+                if (isReport) {
+                    return gulp
+                        .src('./mochawesome-reports/mochawesome.html')
+                        .pipe(openBrowser())
+                        .on('end', done);
+                }
             });
     };
 }

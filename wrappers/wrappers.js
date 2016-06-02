@@ -165,7 +165,6 @@ module.exports = function(app) {
 
     function store(value, variable) {
         this.storedVars[variable] = value;
-        console.log('==========\n', this.storedVars, '\n==========');
         return buildHelpers((cb) => {
             return cb();
         });
@@ -191,7 +190,6 @@ module.exports = function(app) {
     }
 
     function type(target, value) {
-        console.log('==========\n', this.storedVars, '\n==========');
         value = parseStoredVars(value, this.storedVars);
         return buildHelpers((cb) => {
             var by = getBy(target);
@@ -213,7 +211,7 @@ module.exports = function(app) {
 
     function echo(string) {
         string = parseStoredVars(string, this.storedVars);
-        console.log(string);
+        console.log('cmd.echo -> ' + string);
         return buildHelpers((cb) => {
             return cb();
         });
@@ -259,238 +257,238 @@ module.exports = function(app) {
 
     function verifyVisible() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function doubleClickAt() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function waitForPageToLoad() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyAttribute() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function storeExpression() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function select() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function pause() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyValue() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function typeKeys() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function assertText() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function storeCssCount() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function clickAndWait() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyChecked() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function storeSelectOptions() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function assertValue() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifySelectOptions() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifySelectedLabel() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyNotText() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function focus() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function selectWindow() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyNotVisible() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyNotEditable() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function storeValue() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function setSpeed() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function mouseOver() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function runScript() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyNotAttribute() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function getEval() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyEval() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function mouseOut() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyLocation() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function verifyElementNotPresent() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function waitForText() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
     function goBackAndWait() {
         return buildHelpers((cb) => {
-            return cb();
+            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }

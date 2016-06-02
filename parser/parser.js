@@ -65,21 +65,17 @@ function Parser(name, folder, isSuite) {
 
     function readAndGenerate(file, done) {
         var name = fsops.getModuleName(file, 1);
-        var includedDir = file.replace(isSuite ? dirSuitesSrc : dirSrc, '').replace(name, '');
-        var isIncluded = includedDir.replace('/', '').length;
-        var dest = isSuite ? dirSuitesDest : dirDest;
 
-        if (isIncluded) {
-            dest = pathNode.join(dest, includedDir);
-        }
-        //console.log(name, includedDir, dest);
+        var dest = isSuite ? dirSuitesDest : dirDest;
+        var destTest = dirDest;
+
 
 
         fs.readFile(file, 'utf8', (err, data) => {
             if (err) {
                 console.log(err);
             }
-            var parsed = isSuite ? parserSuites(data, name, dest) : parserTests(data);
+            var parsed = isSuite ? parserSuites(data, name, destTest) : parserTests(data, _.snakeCase(name.replace('.html', '')) + '.js');
             var newTest = isSuite ? template.suites(parsed) : template.tests(parsed);
             if (!isSuite) {
                 commandList = commandList.concat(parsed.tests);
@@ -88,11 +84,16 @@ function Parser(name, folder, isSuite) {
         });
     }
 
-    function parserTests(html) {
+    function parserTests(html, fileName) {
         var $ = cheerio.load(html);
         var testCase = {};
-        testCase.testCaseName = $('title').text();
+        testCase.testCaseName = fileName;
         testCase.baseUrl = $('link[rel="selenium.base"]').attr('href') || "";
+
+
+        if(_.endsWith(testCase.baseUrl, '/')){
+            testCase.baseUrl = _.trimEnd(testCase.baseUrl, '/');
+        }
 
         var tr = $('tbody > tr');
 
@@ -118,7 +119,7 @@ function Parser(name, folder, isSuite) {
 
         var $ = cheerio.load(html);
         var testCase = {};
-        testCase.suiteName = suiteName;
+        testCase.suiteName = _.snakeCase(suiteName.replace('.html', '')) + '.js';
 
         var tr = $('tbody > tr');
 
@@ -132,7 +133,7 @@ function Parser(name, folder, isSuite) {
             if (!testName) {
                 return;
             }
-            suites.push(pathNode.join(dest, testName));
+            suites.push(pathNode.join(dest, _.snakeCase(testName)));
 
 
         });
@@ -140,8 +141,6 @@ function Parser(name, folder, isSuite) {
 
         return testCase;
     }
-
-
 
 
 
@@ -160,7 +159,7 @@ function Parser(name, folder, isSuite) {
     }
 
     function generate(testFile, name, dest, done) {
-        name = name.replace(new RegExp('\ ', 'g'), '_');
+        name = _.snakeCase(name);
         console.log(name, dest);
         fs.exists(dest, function(exists) {
             if (exists) {
