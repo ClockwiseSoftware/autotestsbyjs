@@ -24,6 +24,7 @@
 
         function errorHandler(cb) {
             return function(error) {
+                console.log(error);
                 return cb(error);
             };
         }
@@ -94,6 +95,7 @@
                 ById: ById,
                 ByCss: ByCss,
                 ByName: ByName,
+                ByXpathSimple: ByXpathSimple,
                 ByXpath: ByXpath
             };
             var type = getRulesType(target);
@@ -129,6 +131,11 @@
 
 
         function ByXpath(target) {
+            target = target.replace('xpath=(', '').slice(0, -1);
+            return By.xpath(target);
+        }
+
+        function ByXpathSimple(target) {
             return By.xpath(target);
         }
 
@@ -139,7 +146,8 @@
                 ByCss: /^css\=/.test(target),
                 ByName: /^name\=/.test(target),
                 ById: /^id\=/.test(target),
-                ByXpath: /^\/\//.test(target) || /^xpath=/.test(target)
+                ByXpathSimple: /^\/\//.test(target) || /^xpath=/.test(target),
+                ByXpath: /^xpath=/.test(target)
             };
 
             var type = Object.keys(rules).filter(function(rule) {

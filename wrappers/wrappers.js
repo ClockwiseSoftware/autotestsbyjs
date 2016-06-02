@@ -17,6 +17,8 @@ module.exports = function(app) {
     var e = helpers.e;
     var wait = helpers.wait;
 
+    var finishTest = false;
+
 
 
     return {
@@ -24,56 +26,55 @@ module.exports = function(app) {
         storedVars: {},
         end: end,
         setBaseUrl: setBaseUrl,
-        open: open,
-        close: close,
-        click: click,
-        wait: wait,
-        sendKeys: sendKeys,
-        type: type,
-        echo: echo,
-        verifyTitle: verifyTitle,
-        verifyText: verifyText,
-        verifyElementPresent: verifyElementPresent,
-        assertTitle: assertTitle,
-        storeText: storeText,
-        waitForElementPresent: waitForElementPresent,
-        store: store,
 
-
-        verifyVisible: verifyVisible,
-        doubleClickAt: doubleClickAt,
-        waitForPageToLoad: waitForPageToLoad,
-        verifyAttribute: verifyAttribute,
-        storeExpression: storeExpression,
-        select: select,
-        pause: pause,
-        verifyValue: verifyValue,
-        typeKeys: typeKeys,
         assertText: assertText,
-        storeCssCount: storeCssCount,
-        clickAndWait: clickAndWait,
-        verifyChecked: verifyChecked,
-        storeSelectOptions: storeSelectOptions,
+        assertTitle: assertTitle,
         assertValue: assertValue,
-        verifySelectOptions: verifySelectOptions,
-        verifySelectedLabel: verifySelectedLabel,
-        verifyNotText: verifyNotText,
+        click: click,
+        clickAndWait: clickAndWait,
+        close: close,
+        doubleClickAt: doubleClickAt,
+        echo: echo,
         focus: focus,
-        selectWindow: selectWindow,
-        verifyNotVisible: verifyNotVisible,
-        verifyNotEditable: verifyNotEditable,
-        storeValue: storeValue,
-        setSpeed: setSpeed,
-        mouseOver: mouseOver,
-        runScript: runScript,
-        verifyNotAttribute: verifyNotAttribute,
         getEval: getEval,
-        verifyEval: verifyEval,
+        goBackAndWait: goBackAndWait,
         mouseOut: mouseOut,
-        verifyLocation: verifyLocation,
+        mouseOver: mouseOver,
+        open: open,
+        pause: pause,
+        runScript: runScript,
+        select: select,
+        selectWindow: selectWindow,
+        sendKeys: sendKeys,
+        setSpeed: setSpeed,
+        store: store,
+        storeCssCount: storeCssCount,
+        storeExpression: storeExpression,
+        storeSelectOptions: storeSelectOptions,
+        storeText: storeText,
+        storeValue: storeValue,
+        type: type,
+        typeKeys: typeKeys,
+        verifyAttribute: verifyAttribute,
+        verifyChecked: verifyChecked,
         verifyElementNotPresent: verifyElementNotPresent,
+        verifyElementPresent: verifyElementPresent,
+        verifyEval: verifyEval,
+        verifyLocation: verifyLocation,
+        verifyNotAttribute: verifyNotAttribute,
+        verifyNotEditable: verifyNotEditable,
+        verifyNotText: verifyNotText,
+        verifyNotVisible: verifyNotVisible,
+        verifySelectedLabel: verifySelectedLabel,
+        verifySelectOptions: verifySelectOptions,
+        verifyText: verifyText,
+        verifyTitle: verifyTitle,
+        verifyValue: verifyValue,
+        verifyVisible: verifyVisible,
+        wait: wait,
+        waitForElementPresent: waitForElementPresent,
+        waitForPageToLoad: waitForPageToLoad,
         waitForText: waitForText,
-        goBackAndWait: goBackAndWait
     };
 
     function setBaseUrl(url) {
@@ -84,6 +85,9 @@ module.exports = function(app) {
         time = time || 2000;
         var baseUrl = this.baseUrl || '';
 
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return driver.get(baseUrl + url).then(() => {
                 return wait(time)(cb);
@@ -93,7 +97,22 @@ module.exports = function(app) {
 
     }
 
+    function checkExit(isAssert, actualy, expected) {
+        if (isAssert && actualy !== expected) {
+            finishTest = true;
+        }
+    }
+
+    function finish() {
+        return buildHelpers((cb) => {
+            return cb(new Error('TEST WAS STOPED'));
+        });
+    }
+
     function close() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return driver.close().then(e(cb));
         }, true);
@@ -101,20 +120,28 @@ module.exports = function(app) {
     }
 
 
-    function verifyTitle() {
+    function verifyTitle(value, isAssert) {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
-            return driver.getTitle().then(e(cb));
+            return driver.getTitle().then(function(title) {
+                checkExit(isAssert, title, value);
+                chai.assert.equal(title, value);
+                return cb();
+            }, errorHandler);
         });
     }
 
-    function assertTitle(expectedTitle) {
-        return buildHelpers((cb) => {
-            return chai.expect('return document.title').exec.to.equal(expectedTitle).then(e(cb));
-        });
+    function assertTitle(value) {
+        return verifyTitle.apply(this, [value, true]);
     }
 
 
-    function verifyText(target, value) {
+    function verifyText(target, value, isAssert) {
+        if (finishTest) {
+            return finish();
+        }
 
         value = parseStoredVars(value, this.storedVars);
 
@@ -126,11 +153,12 @@ module.exports = function(app) {
             return driver.findElement(by(target))
                 .then(checkElement(function(el) {
                     return el.getText();
-                }), 'find')
+                }))
                 .then(checkElement(function(text) {
+                    checkExit(isAssert, text, value);
                     chai.assert.equal(text, value);
                     return cb();
-                }, target + ' ' + value), errorHandler(cb));
+                }), errorHandler(cb));
 
 
         });
@@ -138,6 +166,9 @@ module.exports = function(app) {
     }
 
     function verifyElementPresent(target) {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -149,6 +180,9 @@ module.exports = function(app) {
     }
 
     function waitForElementPresent(target) {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -164,6 +198,9 @@ module.exports = function(app) {
     }
 
     function store(value, variable) {
+        if (finishTest) {
+            return finish();
+        }
         this.storedVars[variable] = value;
         return buildHelpers((cb) => {
             return cb();
@@ -171,7 +208,11 @@ module.exports = function(app) {
     }
 
     function storeText(target, value) {
+        if (finishTest) {
+            return finish();
+        }
         var storedVars = this.storedVars;
+
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -190,7 +231,11 @@ module.exports = function(app) {
     }
 
     function type(target, value) {
+        if (finishTest) {
+            return finish();
+        }
         value = parseStoredVars(value, this.storedVars);
+
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -210,6 +255,9 @@ module.exports = function(app) {
     }
 
     function echo(string) {
+        if (finishTest) {
+            return finish();
+        }
         string = parseStoredVars(string, this.storedVars);
         console.log('cmd.echo -> ' + string);
         return buildHelpers((cb) => {
@@ -219,6 +267,9 @@ module.exports = function(app) {
     }
 
     function click(target) {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -233,7 +284,11 @@ module.exports = function(app) {
     }
 
     function sendKeys(target, value) {
+        if (finishTest) {
+            return finish();
+        }
         value = parseStoredVars(value, this.storedVars);
+
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
@@ -256,6 +311,9 @@ module.exports = function(app) {
 
 
     function verifyVisible() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -263,6 +321,9 @@ module.exports = function(app) {
     }
 
     function doubleClickAt() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -270,13 +331,19 @@ module.exports = function(app) {
     }
 
     function waitForPageToLoad() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            return wait(500)(cb);
         });
 
     }
 
     function verifyAttribute() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -284,6 +351,9 @@ module.exports = function(app) {
     }
 
     function storeExpression() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -291,6 +361,9 @@ module.exports = function(app) {
     }
 
     function select() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -298,6 +371,9 @@ module.exports = function(app) {
     }
 
     function pause() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -305,6 +381,9 @@ module.exports = function(app) {
     }
 
     function verifyValue() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -312,20 +391,23 @@ module.exports = function(app) {
     }
 
     function typeKeys() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
     }
 
-    function assertText() {
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
-
+    function assertText(target, value) {
+        return verifyText.apply(this, [target, value, true]);
     }
 
     function storeCssCount() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -333,6 +415,9 @@ module.exports = function(app) {
     }
 
     function clickAndWait() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -340,6 +425,9 @@ module.exports = function(app) {
     }
 
     function verifyChecked() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -347,6 +435,9 @@ module.exports = function(app) {
     }
 
     function storeSelectOptions() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -354,6 +445,9 @@ module.exports = function(app) {
     }
 
     function assertValue() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -361,6 +455,9 @@ module.exports = function(app) {
     }
 
     function verifySelectOptions() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -368,6 +465,9 @@ module.exports = function(app) {
     }
 
     function verifySelectedLabel() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -375,6 +475,9 @@ module.exports = function(app) {
     }
 
     function verifyNotText() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -382,6 +485,9 @@ module.exports = function(app) {
     }
 
     function focus() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -389,6 +495,9 @@ module.exports = function(app) {
     }
 
     function selectWindow() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -396,6 +505,9 @@ module.exports = function(app) {
     }
 
     function verifyNotVisible() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -403,6 +515,9 @@ module.exports = function(app) {
     }
 
     function verifyNotEditable() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -410,6 +525,9 @@ module.exports = function(app) {
     }
 
     function storeValue() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -417,6 +535,9 @@ module.exports = function(app) {
     }
 
     function setSpeed() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -424,6 +545,9 @@ module.exports = function(app) {
     }
 
     function mouseOver() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -431,6 +555,9 @@ module.exports = function(app) {
     }
 
     function runScript() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -438,6 +565,9 @@ module.exports = function(app) {
     }
 
     function verifyNotAttribute() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -445,6 +575,9 @@ module.exports = function(app) {
     }
 
     function getEval() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -452,6 +585,9 @@ module.exports = function(app) {
     }
 
     function verifyEval() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -459,6 +595,9 @@ module.exports = function(app) {
     }
 
     function mouseOut() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -466,6 +605,9 @@ module.exports = function(app) {
     }
 
     function verifyLocation() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -473,6 +615,9 @@ module.exports = function(app) {
     }
 
     function verifyElementNotPresent() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -480,6 +625,9 @@ module.exports = function(app) {
     }
 
     function waitForText() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
@@ -487,6 +635,9 @@ module.exports = function(app) {
     }
 
     function goBackAndWait() {
+        if (finishTest) {
+            return finish();
+        }
         return buildHelpers((cb) => {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
