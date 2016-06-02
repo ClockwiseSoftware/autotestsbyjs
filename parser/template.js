@@ -2,7 +2,9 @@
   var _ = require('lodash');
   _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
-
+function windowsPathReplace(value){
+  return value.replace(/\\/g,'\\\\').replace(/ /g, '');
+}
 
   //var compiled = _.template('hello {{ user }}!');
   //compiled({ 'user': 'mustache' });
@@ -68,7 +70,6 @@
       ].join('\n');
 
 
-
       var compiledHead = _.template(headTemplate);
       var compiledTail = _.template(tailTemplate);
       var timeout = data.suites.length * 100000;
@@ -76,13 +77,13 @@
 
       var filePathList = data.suites;
 
-      data.switchers = filePathList.map((el, i) => "'" + i + "' : 1," + "\t\t\t// " + el).join(',\n');
-      var testsList = filePathList.map(el => "'" + el + "'").join(',\n');
+      data.switchers = filePathList.map((el, i) => "'" + i + "' : 1," + "\t\t\t// " + windowsPathReplace(el)).join(',\n');
+      var testsList = filePathList.map(el => "'" + windowsPathReplace(el) + "'").join(',\n');
 
       var suites = filePathList.map((suiteFilePath, i) => {
           var compiled = _.template(unitTestTemplate);
           return compiled({
-              suiteFilePath: suiteFilePath,
+              suiteFilePath: windowsPathReplace(suiteFilePath),
               num: i
           });
 
