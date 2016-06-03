@@ -18,6 +18,7 @@ module.exports = function(app) {
     var webElementExtended = helpers.WebElementExtended;
     var e = helpers.e;
     var wait = helpers.wait;
+    var eq = chai.assert.equal;
 
     var finishTest = false;
 
@@ -135,7 +136,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             return driver.getTitle().then(function(title) {
                 checkExit(isAssert, title, value);
-                chai.assert.equal(title, value);
+                eq(title, value);
                 return cb();
             }, errorHandler);
         });
@@ -164,7 +165,7 @@ module.exports = function(app) {
                 }))
                 .then(checkElement(function(text) {
                     checkExit(isAssert, text, value);
-                    chai.assert.equal(text, value);
+                    eq(text, value);
                     return cb();
                 }), errorHandler(cb));
 
@@ -327,7 +328,7 @@ module.exports = function(app) {
                     return el.isDisplayed();
                 })
                 .then(function(visibility) {
-                    chai.assert.equal(visibility, true);
+                    eq(visibility, true);
                     return cb();
                 }, errorHandler);
         });
@@ -354,22 +355,43 @@ module.exports = function(app) {
 
     }
 
-    function waitForPageToLoad() {
+    function waitForPageToLoad(tm) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return wait(500)(cb);
+            if (tm) {
+                setTimeout((() => cb(new Error('page load timout exprired'))), tm);
+            }
+
+            return wait(2000)(cb);
+
         });
 
     }
 
-    function verifyAttribute() {
+    function verifyAttribute(target, value, isAssert) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var parts = target.split('@');
+            var locator = parts[0];
+            var attr = parts[1];
+
+            var by = getBy(locator);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            return driver.findElement(by(locator))
+                .then(function(el) {
+                    return el.getAttribute(attr);
+                })
+                .then(function(attr) {
+                    checkExit(isAssert, attr, value);
+                    eq(attr, value);
+                    return cb();
+                }, errorHandler);
         });
 
     }
@@ -422,7 +444,7 @@ module.exports = function(app) {
                         attr = '';
                     }
                     checkExit(isAssert, attr, value);
-                    chai.assert.equal(attr, value);
+                    eq(attr, value);
                     return cb();
                 }), errorHandler(cb));
 
