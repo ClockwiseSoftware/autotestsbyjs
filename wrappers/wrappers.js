@@ -14,6 +14,8 @@ module.exports = function(app) {
     var checkElement = helpers.checkElement;
     var parseStoredVars = helpers.parseStoredVars;
     var errorHandler = helpers.errorHandler;
+    var byTargetErrorHandler = helpers.byTargetErrorHandler;
+    var webElementGetValue = helpers.WebElementGetValue;
     var e = helpers.e;
     var wait = helpers.wait;
 
@@ -82,6 +84,9 @@ module.exports = function(app) {
         this.baseUrl = url || '';
     }
 
+
+
+
     function open(url, time) {
         url = parseStoredVars(url, this.storedVars);
         time = time || 2000;
@@ -101,7 +106,7 @@ module.exports = function(app) {
 
     function checkExit(isAssert, actualy, expected) {
         if (isAssert && actualy !== expected) {
-            finishTest = true;
+            finishTest = false;
         }
     }
 
@@ -150,7 +155,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.findElement(by(target))
                 .then(checkElement(function(el) {
@@ -174,7 +179,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.isElementPresent(by(target)).then(e(cb));
         });
@@ -188,7 +193,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.wait(function() {
                 return driver.isElementPresent(by(target)).then(function(el) {
@@ -218,7 +223,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.findElement(by(target))
                 .then(function(el) {
@@ -241,7 +246,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             var el = driver.findElement(by(target));
             return el.clear()
@@ -275,7 +280,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.findElement(by(target)).click().then(function() {
                 return wait(500)(cb);
@@ -294,7 +299,7 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             var by = getBy(target);
             if (!by) {
-                return cb();
+                return byTargetErrorHandler(cb);
             }
             return driver.findElement(by(target)).sendKeys(value).then(function() {
                 return wait(500)(cb);
@@ -382,12 +387,29 @@ module.exports = function(app) {
 
     }
 
-    function verifyValue() {
+    function verifyValue(target, value, isAssert) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            return driver.findElement(by(target))
+                .then(checkElement(function(el) {
+                    return webElementGetValue(el);
+                }))
+                .then(checkElement(function(attr) {
+                    if (attr === 'cstm_=_empty_=_') {
+                        attr = '';
+                    }
+                    checkExit(isAssert, attr, value);
+                    chai.assert.equal(attr, value);
+                    return cb();
+                }), errorHandler(cb));
+
+
         });
 
     }
@@ -504,7 +526,7 @@ module.exports = function(app) {
             return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
         });
 
-    } 
+    }
 
     function selectFrame() {
         if (finishTest) {
