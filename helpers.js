@@ -20,7 +20,7 @@
             parseStoredVars: parseStoredVars,
             errorHandler: errorHandler,
             byTargetErrorHandler: byTargetErrorHandler,
-            WebElementGetValue: getValue,
+            WebElementExtended: WebElementExtended,
             wait: wait
         };
 
@@ -31,7 +31,7 @@
             };
         }
 
-        function byTargetErrorHandler(cb){
+        function byTargetErrorHandler(cb) {
             return errorHandler(cb)(new Error('Unknow target type'));
         }
 
@@ -163,34 +163,47 @@
             return type && type[0] || null;
         }
 
-        function getValue(d) {
-            return new Promise(function(resolve, reject) {
-                d.getTagName()
-                    .then(function(tag) {
-                        console.log(tag);
-                        return (tag === 'input') ? d.getAttribute('type') : reject(new Error('not input tag'));
-                    })
-                    .then(function(type) {
 
-                        var r;
-                        switch (type) {
-                            case 'checkbox':
-                            case 'radio':
-                                r = new Promise((res) => d.getAttribute('checked').then((el) => res(el ? 'on' : 'off')));
-                                break;
-                            case 'text':
-                            case 'hidden':
-                                 r = new Promise((res) => d.getAttribute('value').then((el) => res(el || 'cstm_=_empty_=_' )));
-                                break;
-                            default:
-                                r = null;
-                        }
-                        return r || reject(new Error('unknown input type'));
-                    })
-                    .then(function(value) {
-                        return resolve(value);
-                    }, reject);
-            });
+        function WebElementExtended(WebElement) {
+            return {
+                getValue: getValue,
+                getCssCount: getCssCount
+            };
+
+            function getCssCount(){
+                
+            }
+
+            function getValue() {
+                return new Promise(function(resolve, reject) {
+                    WebElement.getTagName()
+                        .then(function(tag) {
+                            console.log(tag);
+                            return (tag === 'input') ? WebElement.getAttribute('type') : reject(new Error('not input tag'));
+                        })
+                        .then(function(type) {
+
+                            var r;
+                            switch (type) {
+                                case 'checkbox':
+                                case 'radio':
+                                    r = new Promise((res) => WebElement.getAttribute('checked').then((el) => res(el ? 'on' : 'off')));
+                                    break;
+                                case 'text':
+                                case 'hidden':
+                                    r = new Promise((res) => WebElement.getAttribute('value').then((el) => res(el || 'cstm_=_empty_=_')));
+                                    break;
+                                default:
+                                    r = null;
+                            }
+                            return r || reject(new Error('unknown input type'));
+                        })
+                        .then(function(value) {
+                            return resolve(value);
+                        }, reject);
+                });
+            }
         }
+
 
     };

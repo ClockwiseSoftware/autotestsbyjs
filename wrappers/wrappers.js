@@ -15,7 +15,7 @@ module.exports = function(app) {
     var parseStoredVars = helpers.parseStoredVars;
     var errorHandler = helpers.errorHandler;
     var byTargetErrorHandler = helpers.byTargetErrorHandler;
-    var webElementGetValue = helpers.WebElementGetValue;
+    var webElementExtended = helpers.WebElementExtended;
     var e = helpers.e;
     var wait = helpers.wait;
 
@@ -57,7 +57,7 @@ module.exports = function(app) {
         storeValue: storeValue,
         selectFrame: selectFrame,
         type: type,
-        typeKeys: typeKeys,
+        typeKeys: sendKeys,
         verifyAttribute: verifyAttribute,
         verifyChecked: verifyChecked,
         verifyElementNotPresent: verifyElementNotPresent,
@@ -314,15 +314,23 @@ module.exports = function(app) {
 
 
 
-
-
-
-    function verifyVisible() {
+    function verifyVisible(target) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            return driver.findElement(by(target))
+                .then(function(el) {
+                    return el.isDisplayed();
+                })
+                .then(function(visibility) {
+                    chai.assert.equal(visibility, true);
+                    return cb();
+                }, errorHandler);
         });
 
     }
@@ -398,7 +406,7 @@ module.exports = function(app) {
             }
             return driver.findElement(by(target))
                 .then(checkElement(function(el) {
-                    return webElementGetValue(el);
+                    return webElementExtended(el).getValue();
                 }))
                 .then(checkElement(function(attr) {
                     if (attr === 'cstm_=_empty_=_') {
@@ -414,15 +422,6 @@ module.exports = function(app) {
 
     }
 
-    function typeKeys() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
-
-    }
 
     function assertText(target, value) {
         return verifyText.apply(this, [target, value, true]);
