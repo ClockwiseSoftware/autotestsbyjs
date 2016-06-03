@@ -35,7 +35,8 @@ module.exports = function(app) {
         click: click,
         clickAndWait: clickAndWait,
         close: close,
-        doubleClickAt: doubleClickAt,
+        doubleClick: doubleClick,
+        doubleClickAt: doubleClick,
         echo: echo,
         focus: focus,
         getEval: getEval,
@@ -312,8 +313,6 @@ module.exports = function(app) {
 
 
 
-
-
     function verifyVisible(target) {
         if (finishTest) {
             return finish();
@@ -335,12 +334,22 @@ module.exports = function(app) {
 
     }
 
-    function doubleClickAt() {
+    function doubleClick(target) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            return driver.findElement(by(target))
+                .then(function(el) {
+                    return seq.mouseMove(el).doubleClick().perform();
+                })
+                .then(function() {
+                    return wait(5000)(cb);
+                }, errorHandler);
         });
 
     }

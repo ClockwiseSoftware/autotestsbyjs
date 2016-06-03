@@ -53,7 +53,7 @@ function buildDriver() {
         waiter: waiter,
         By: sw.By,
         until: sw.until,
-        seq: sw.ActionSequence,
+        seq: new sw.ActionSequence(driver),
         speed: speed,
         isNotClose: isNotClose
     };
