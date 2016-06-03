@@ -44,10 +44,13 @@
             };
         }
 
-        function parseStoredVars(value, vars) {
+        function parseStoredVars(value, vars, isRecurse) {
             if (storedVarsPattern.test(value)) {
                 var parsed = _.template(value);
-                return parsed(vars);
+                value  =  parsed(vars);
+                if(isRecurse){
+                   return parseStoredVars(value, vars, isRecurse);
+                }
             }
             return value;
         }
@@ -171,7 +174,7 @@
             };
 
             function getCssCount(){
-                
+
             }
 
             function getValue() {

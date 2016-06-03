@@ -53,10 +53,11 @@ module.exports = function(app) {
         setSpeed: setSpeed,
         store: store,
         storeCssCount: storeCssCount,
-        storeExpression: storeExpression,
+        storeExpression: store,
         storeSelectOptions: storeSelectOptions,
         storeText: storeText,
         storeValue: storeValue,
+        storeEval: storeEval,
         selectFrame: selectFrame,
         type: type,
         typeKeys: sendKeys,
@@ -130,6 +131,7 @@ module.exports = function(app) {
 
 
     function verifyTitle(value, isAssert) {
+        value = parseStoredVars(value, this.storedVars);
         if (finishTest) {
             return finish();
         }
@@ -374,6 +376,7 @@ module.exports = function(app) {
         if (finishTest) {
             return finish();
         }
+        value = parseStoredVars(value, this.storedVars);
         return buildHelpers((cb) => {
             var parts = target.split('@');
             var locator = parts[0];
@@ -396,15 +399,8 @@ module.exports = function(app) {
 
     }
 
-    function storeExpression() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
 
-    }
+
 
     function select() {
         if (finishTest) {
@@ -451,6 +447,17 @@ module.exports = function(app) {
 
         });
 
+    }
+
+    function storeEval(value, variable) {
+        if (finishTest) {
+            return finish();
+        }
+        value = parseStoredVars(value, this.storedVars, true);
+        this.storedVars[variable] = eval(value);
+        return buildHelpers((cb) => {
+            return cb();
+        });
     }
 
 
