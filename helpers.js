@@ -19,6 +19,8 @@
             checkElement: checkElement,
             parseStoredVars: parseStoredVars,
             errorHandler: errorHandler,
+            getRulesType: getRulesType,
+            getRulesTypeAndCut: getRulesTypeAndCut,
             byTargetErrorHandler: byTargetErrorHandler,
             WebElementExtended: WebElementExtended,
             wait: wait
@@ -47,9 +49,9 @@
         function parseStoredVars(value, vars, isRecurse) {
             if (storedVarsPattern.test(value)) {
                 var parsed = _.template(value);
-                value  =  parsed(vars);
-                if(isRecurse){
-                   return parseStoredVars(value, vars, isRecurse);
+                value = parsed(vars);
+                if (isRecurse) {
+                    return parseStoredVars(value, vars, isRecurse);
                 }
             }
             return value;
@@ -148,6 +150,37 @@
             return By.xpath(target);
         }
 
+        function getRulesTypeAndCut(target) {
+            var value;
+            var who = getRulesType(target);
+            switch (who) {
+                case 'ByLink':
+                    value = target.replace('link=', '');
+                    break;
+                case 'ByCss':
+                    value = target.replace('css=', '');
+                    break;
+                case 'ByName':
+                    value = target.replace('name=', '');
+                    break;
+                case 'ById':
+                    value = target.replace('id=', '');
+                    break;
+                case 'ByXpathSimple':
+                    value = target;
+                    break;
+                case 'ByXpath':
+                    value = target.replace('xpath=', '');
+                    break;
+            }
+
+            return {
+                type: who || null,
+                value: value
+            };
+
+        }
+
 
         function getRulesType(target) {
             var rules = {
@@ -173,7 +206,7 @@
                 getCssCount: getCssCount
             };
 
-            function getCssCount(){
+            function getCssCount() {
 
             }
 

@@ -14,6 +14,8 @@ module.exports = function(app) {
     var checkElement = helpers.checkElement;
     var parseStoredVars = helpers.parseStoredVars;
     var errorHandler = helpers.errorHandler;
+    var getRulesType = helpers.getRulesTypeAndCut;
+    var getRulesTypeAndCut = helpers.getRulesType;
     var byTargetErrorHandler = helpers.byTargetErrorHandler;
     var webElementExtended = helpers.WebElementExtended;
     var e = helpers.e;
@@ -399,15 +401,106 @@ module.exports = function(app) {
 
     }
 
+    function domSelect(target, targetForOption, type, typeOption) {
+        function getElementByXpath(path) {
+            return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        }
+
+        var select, options;
+
+        switch (type) {
+            case 'css':
+                select = document.querySelectorAll(target);
+                break;
+            case 'xpath':
+                select = getElementByXpath(target);
+                break;
+            case 'name':
+                select = document.querySelectorAll('select[name="' + target + '"]');
+                break;
+        }
+
+        if (select && select.length > 0) {
+            options = select[0].getElementsByTagName('option');
+        }
+        console.log(target, targetForOption, type, typeOption);
+        /*
+            target и type  === nul
+            нужно понять почему они не вычисляются
+        */
+        Object.keys(options).forEach(function(key, i) {
+            var opt = options[key];
+            switch (typeOption) {
+                case 'label':
+                    if (opt.label === targetForOption) {
+                        opt.selected = true;
+                    }
+                    break;
+
+                case 'value':
+                    if (/^regexp\:/.test(targetForOption)) {
+                        targetForOption = targetForOption.replace('regexp:', '');
+                        if (new RegExp(targetForOption, 'ig').test(opt.value)) {
+                            opt.selected = true;
+                        }
+                    } else {
+                        if (opt.value === targetForOption) {
+                            opt.selected = true;
+                        }
+                    }
+
+                    break;
+                case 'id':
+                    if (opt.id === targetForOption) {
+                        opt.selected = true;
+                    }
+                    break;
+                case 'index':
+                    if (i === Number(targetForOption)) {
+                        opt.selected = true;
+                    }
+                    break;
+                default:
+                    if (/^regexp\:/.test(targetForOption)) {
+                        targetForOption = targetForOption.replace('regexp:', '');
+                        if (new RegExp(targetForOption, 'ig').test(opt.value)) {
+                            opt.selected = true;
+                        }
+                    } else {
+                        if (opt.value === targetForOption) {
+                            opt.selected = true;
+                        }
+                    }
+            }
+
+        });
+    }
 
 
 
-    function select() {
+    function select(target, targetForOption) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getRulesTypeAndCut(target);
+            console.log(by);
+            var optionType;
+            var targetOptionsTypes = {
+                label: /^label=/.test(targetForOption),
+                value: /^value=/.test(targetForOption),
+                id: /^id=/.test(targetForOption),
+                index: /^index=/.test(targetForOption)
+            };
+            var x = Object.keys(targetOptionsTypes).filter((key) => targetOptionsTypes[key]);
+            optionType = x.length > 0 ? x[0] : 'label';
+            driver.executeAsyncScript(domSelect, by.value, targetForOption, by.type, optionType).
+
+            then(function() {
+                console.log(
+                    'Elapsed time: ' + (new Date().getTime() - 150) + ' ms');
+                cb();
+            });
         });
 
     }
