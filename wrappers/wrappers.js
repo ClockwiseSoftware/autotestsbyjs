@@ -14,8 +14,8 @@ module.exports = function(app) {
     var checkElement = helpers.checkElement;
     var parseStoredVars = helpers.parseStoredVars;
     var errorHandler = helpers.errorHandler;
-    var getRulesType = helpers.getRulesTypeAndCut;
-    var getRulesTypeAndCut = helpers.getRulesType;
+    var getRulesType = helpers.getRulesType;
+    var getRulesTypeAndCut = helpers.getRulesTypeAndCut;
     var byTargetErrorHandler = helpers.byTargetErrorHandler;
     var webElementExtended = helpers.WebElementExtended;
     var e = helpers.e;
@@ -402,78 +402,105 @@ module.exports = function(app) {
     }
 
     function domSelect(target, targetForOption, type, typeOption) {
+        var callback = arguments[arguments.length - 1];
+
         function getElementByXpath(path) {
-            return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+            return document.evaluate('//*[@id="ola"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         }
 
         var select, options;
 
         switch (type) {
-            case 'css':
+            case 'ById':
+                console.log('select id');
+                select = document.querySelectorAll('#' + target);
+                break;
+            case 'ByCss':
+                console.log('select css');
+                if (!(/^'./.test(target))) {
+                    target = '.' + target;
+                }
                 select = document.querySelectorAll(target);
                 break;
-            case 'xpath':
+            case 'ByXpath':
+            case 'ByXpathSimple':
+                console.log('select xpath');
                 select = getElementByXpath(target);
+                select = select ? [select] : null;
                 break;
-            case 'name':
+            case 'ByName':
+                console.log('select name');
                 select = document.querySelectorAll('select[name="' + target + '"]');
                 break;
         }
 
         if (select && select.length > 0) {
             options = select[0].getElementsByTagName('option');
+        } else {
+            callback('Selector not found');
+            return;
         }
         console.log(target, targetForOption, type, typeOption);
-        /*
-            target и type  === nul
-            нужно понять почему они не вычисляются
-        */
+
+        if (!options) {
+            callback('Option of select not found');
+            return;
+        }
         Object.keys(options).forEach(function(key, i) {
             var opt = options[key];
             switch (typeOption) {
                 case 'label':
-                    if (opt.label === targetForOption) {
-                        opt.selected = true;
+                    console.log('option     label');
+
+                    if (/^regexp\:/.test(targetForOption)) {
+                        console.log('option label with regex');
+                        if (new RegExp(targetForOption.replace('regexp:', ''), 'ig').test(opt.label)) {
+                            opt.selected = true;
+                        }
+                    } else {
+                        if (opt.label === targetForOption) {
+                            opt.selected = true;
+                        }
                     }
                     break;
 
                 case 'value':
-                    if (/^regexp\:/.test(targetForOption)) {
-                        targetForOption = targetForOption.replace('regexp:', '');
-                        if (new RegExp(targetForOption, 'ig').test(opt.value)) {
-                            opt.selected = true;
-                        }
-                    } else {
-                        if (opt.value === targetForOption) {
-                            opt.selected = true;
-                        }
+                    console.log('option value');
+
+                    if (opt.value === targetForOption) {
+                        opt.selected = true;
                     }
 
                     break;
                 case 'id':
+                    console.log('option id');
                     if (opt.id === targetForOption) {
                         opt.selected = true;
                     }
                     break;
                 case 'index':
+                    console.log('option index');
                     if (i === Number(targetForOption)) {
                         opt.selected = true;
                     }
                     break;
                 default:
                     if (/^regexp\:/.test(targetForOption)) {
+                        console.log('option label with regex');
                         targetForOption = targetForOption.replace('regexp:', '');
-                        if (new RegExp(targetForOption, 'ig').test(opt.value)) {
+                        if (new RegExp(targetForOption.replace('regexp:', ''), 'ig').test(opt.label)) {
                             opt.selected = true;
                         }
                     } else {
-                        if (opt.value === targetForOption) {
+                        if (opt.label === targetForOption) {
                             opt.selected = true;
                         }
                     }
             }
 
         });
+        callback();
     }
 
 
@@ -484,7 +511,6 @@ module.exports = function(app) {
         }
         return buildHelpers((cb) => {
             var by = getRulesTypeAndCut(target);
-            console.log(by);
             var optionType;
             var targetOptionsTypes = {
                 label: /^label=/.test(targetForOption),
@@ -494,11 +520,27 @@ module.exports = function(app) {
             };
             var x = Object.keys(targetOptionsTypes).filter((key) => targetOptionsTypes[key]);
             optionType = x.length > 0 ? x[0] : 'label';
+
+            switch (optionType) {
+                case 'label':
+                    targetForOption = targetForOption.replace('label=', '');
+                    break;
+                case 'id':
+                    targetForOption = targetForOption.replace('id=', '');
+                    break;
+                case 'value':
+                    targetForOption = targetForOption.replace('value=', '');
+                    break;
+                case 'index':
+                    targetForOption = targetForOption.replace('index=', '');
+                    break;
+            }
             driver.executeAsyncScript(domSelect, by.value, targetForOption, by.type, optionType).
 
-            then(function() {
-                console.log(
-                    'Elapsed time: ' + (new Date().getTime() - 150) + ' ms');
+            then(function(error) {
+                if (error) {
+                    return cb(new Error(error));
+                }
                 cb();
             });
         });
