@@ -21,6 +21,7 @@
             errorHandler: errorHandler,
             getRulesType: getRulesType,
             getRulesTypeAndCut: getRulesTypeAndCut,
+            getRegExpFunction: getRegExpFunction,
             byTargetErrorHandler: byTargetErrorHandler,
             WebElementExtended: WebElementExtended,
             wait: wait
@@ -201,15 +202,39 @@
             return type && type[0] || null;
         }
 
+        function getRegExpFunction(value) {
+            if (/^regexp\:\(/.test(value)) {
+                return function(value) {
+                    var pattern = value.match(/^regexp\:\((.*?)\)/)[1];
+                    return {
+                        test: function(member) {
+                           return new RegExp(pattern, 'ig').test(member);
+                        }
+                    };
+                };
+            }
+        }
+
 
         function WebElementExtended(WebElement) {
             return {
                 getValue: getValue,
-                getCssCount: getCssCount
+                getSelectOptions: getSelectOptions
             };
 
-            function getCssCount() {
-
+            function getSelectOptions() {
+                return WebElement.findElements(By.css('option'))
+                    .then(function(options) {
+                        return options.map(function(option) {
+                            return option.getAttribute('label');
+                        });
+                    })
+                    .then(function(arr) {
+                        var labels = arr.map(function(a) {
+                            return a['value_'];
+                        });
+                        return labels;
+                    });
             }
 
             function getValue() {

@@ -570,18 +570,12 @@ module.exports = function(app) {
             if (!by) {
                 return byTargetErrorHandler(cb);
             }
-            driver.findElement(by(target)).then(function(el) {
-                    return el.findElements(By.css('option'));
+            driver
+                .findElement(by(target))
+                .then(function(el) {
+                    return webElementExtended(el).getSelectOptions();
                 })
-                .then(function(options) {
-                    return options.map(function(option) {
-                        return option.getAttribute('label');
-                    });
-                })
-                .then(function(arr) {
-                    var labels = arr.map(function(a) {
-                        return a['value_'];
-                    });
+                .then(function(labels) {
                     storedVars[variable] = labels;
                     cb();
                 }, errorHandler);
@@ -589,22 +583,36 @@ module.exports = function(app) {
 
     }
 
-    function assertValue() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
+    function assertValue(target, value) {
+        return verifyValue(target, value, true);
 
     }
 
-    function verifySelectOptions() {
+    function verifySelectOptions(target, value) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            var regexpFunc = helpers.getRegExpFunction(value);
+            driver
+                .findElement(by(target))
+                .then(function(el) {
+                    return webElementExtended(el).getSelectOptions();
+                })
+                .then(function(labels) {
+                    var some = labels.some(function(label) {
+                        if (regexpFunc) {
+                            return regexpFunc(value).test(label);
+                        }
+                        return value === label;
+                    });
+                    eq(some, true, 'Actual value ' + labels.toString() + ' did not match ' + value);
+                    cb();
+                }, errorHandler);
         });
 
     }
