@@ -617,12 +617,30 @@ module.exports = function(app) {
 
     }
 
-    function verifySelectedLabel() {
+    function verifySelectedLabel(target, value) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            var regexpFunc = helpers.getRegExpFunction(value);
+            driver
+                .findElement(by(target))
+                .then(function(el) {
+                    return webElementExtended(el).getSelectedLabel();
+                })
+                .then(function(label) {
+                    if (regexpFunc) {
+                        eq(regexpFunc(value).test(label), true, 'Actual value ' + label + ' did not match ' + value);
+                        return cb();
+                    }
+
+                    eq(label, value);
+                    cb();
+                }, errorHandler);
         });
 
     }

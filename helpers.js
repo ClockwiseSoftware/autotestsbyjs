@@ -208,7 +208,7 @@
                     var pattern = value.match(/^regexp\:\((.*?)\)/)[1];
                     return {
                         test: function(member) {
-                           return new RegExp(pattern, 'ig').test(member);
+                            return new RegExp(pattern, 'ig').test(member);
                         }
                     };
                 };
@@ -219,7 +219,8 @@
         function WebElementExtended(WebElement) {
             return {
                 getValue: getValue,
-                getSelectOptions: getSelectOptions
+                getSelectOptions: getSelectOptions,
+                getSelectedLabel: getSelectedLabel
             };
 
             function getSelectOptions() {
@@ -234,6 +235,27 @@
                             return a['value_'];
                         });
                         return labels;
+                    });
+            }
+
+            function getSelectedLabel() {
+                return WebElement.findElements(By.css('option'))
+                    .then(function(options) {
+                        return Promise.all([
+                            options.map(function(option) {
+                                return option.getAttribute('label');
+                            }),
+                            options.map(function(option) {
+                                return option.getAttribute('selected');
+                            })
+                        ]);
+
+                    })
+                    .then(function(obj) {
+                        var labels = obj[0].filter(function(label, i) {
+                            return obj[1][i]['value_'];
+                        });
+                        return labels[0];
                     });
             }
 
