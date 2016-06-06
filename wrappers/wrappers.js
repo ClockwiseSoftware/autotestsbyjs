@@ -508,12 +508,23 @@ module.exports = function(app) {
 
     }
 
-    function clickAndWait() {
+    function clickAndWait(target) {
         if (finishTest) {
             return finish();
         }
+
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            var ByType = getRulesType(target);
+            click(target).end(function() {
+                if (ByType === 'ByLink') {
+                    return waitForPageToLoad().end(cb);
+                }
+                cb();
+            });
         });
 
     }
