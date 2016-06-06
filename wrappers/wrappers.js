@@ -529,12 +529,33 @@ module.exports = function(app) {
 
     }
 
-    function verifyChecked() {
+    function verifyChecked(target, isAssert) {
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            return driver.findElement(by(target))
+                .then(checkElement(function(el) {
+                    return webElementExtended(el).getValue();
+                }))
+                .then(checkElement(function(attr) {
+                    if (attr === 'cstm_=_empty_=_') {
+                        attr = '';
+                    }
+
+                    if (attr !== 'on' && attr !== 'off') {
+                        return cb(new Error('Element is not radio or checkbox type'));
+                    }
+                    checkExit(isAssert, attr, 'on');
+                    eq(attr, 'on');
+                    return cb();
+                }), errorHandler(cb));
+
+
         });
 
     }
