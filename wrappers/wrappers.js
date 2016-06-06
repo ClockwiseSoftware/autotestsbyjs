@@ -22,20 +22,17 @@ module.exports = function(app) {
     var e = helpers.e;
     var wait = helpers.wait;
     var eq = chai.assert.equal;
+    var ne = chai.assert.notEqual;
 
     var finishTest = false;
 
 
 
-    return {
+    var wrappers = {
         flow: [],
         storedVars: {},
         end: end,
         setBaseUrl: setBaseUrl,
-
-        assertText: assertText,
-        assertTitle: assertTitle,
-        assertValue: assertValue,
         click: click,
         clickAndWait: clickAndWait,
         close: close,
@@ -66,14 +63,11 @@ module.exports = function(app) {
         typeKeys: sendKeys,
         verifyAttribute: verifyAttribute,
         verifyChecked: verifyChecked,
+        verifyEditable: verifyEditable,
         verifyElementNotPresent: verifyElementNotPresent,
         verifyElementPresent: verifyElementPresent,
         verifyEval: verifyEval,
         verifyLocation: verifyLocation,
-        verifyNotAttribute: verifyNotAttribute,
-        verifyNotEditable: verifyNotEditable,
-        verifyNotText: verifyNotText,
-        verifyNotVisible: verifyNotVisible,
         verifySelectedLabel: verifySelectedLabel,
         verifySelectOptions: verifySelectOptions,
         verifyText: verifyText,
@@ -86,8 +80,58 @@ module.exports = function(app) {
         waitForText: waitForText,
     };
 
+
+
+
+    function extendWrappers(wrappers) {
+        _.chain(wrappers).keys().forEach(function(key) {
+            if (/^verify/.test(key)) {
+
+                var keyAssert =  key.replace('verify', 'assert');
+                var keyVerifyNot;
+                var keyAssertNot;
+
+                if (/Pesent/.test(key)) {
+                    keyVerifyNot = key.replace('Present', 'NotPresent');
+                    keyAssertNot = key.replace('verify', 'assert').replace('Present', 'NotPresent');
+                } else {
+                    keyVerifyNot = key.replace('verify', 'verifyNot');
+                    keyAssertNot = key.replace('verify', 'assertNot');
+                }
+
+                wrappers[keyAssert] = function() {
+                    var args = _.map(arguments);
+                    return wrappers[key].apply(wrappers, args.concat([true, false]));
+                };
+
+                wrappers[keyVerifyNot] = function() {
+                    var args = _.map(arguments);
+                    return wrappers[key].apply(wrappers, args.concat([false, true]));
+                };
+
+                wrappers[keyAssertNot] = function() {
+                    var args = _.map(arguments);
+                    return wrappers[key].apply(wrappers, args.concat([true, true]));
+                };
+            }
+
+        }).value();
+        return wrappers;
+    }
+
+    wrappers = extendWrappers(wrappers);
+    return wrappers;
+
     function setBaseUrl(url) {
         this.baseUrl = url || '';
+    }
+
+    function assert(actualy, expected, message, revert) {
+        if (revert) {
+            ne(actualy, expected, message);
+        } else {
+            eq(actualy, expected, message);
+        }
     }
 
 
@@ -110,9 +154,9 @@ module.exports = function(app) {
 
     }
 
-    function checkExit(isAssert, actualy, expected) {
-        if (isAssert && actualy !== expected) {
-            finishTest = false;
+    function checkExit(isAssert, actualy, expected, revert) {
+        if (isAssert) {
+            finishTest = revert ? actualy === expected : actualy !== expected;
         }
     }
 
@@ -133,26 +177,21 @@ module.exports = function(app) {
     }
 
 
-    function verifyTitle(value, isAssert) {
+    function verifyTitle(value, isAssert, revert) {
         value = parseStoredVars(value, this.storedVars);
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
             return driver.getTitle().then(function(title) {
-                checkExit(isAssert, title, value);
-                eq(title, value);
+                checkExit(isAssert, title, value, revert);
+                assert(title, value, null, revert);
                 return cb();
             }, errorHandler);
         });
     }
 
-    function assertTitle(value) {
-        return verifyTitle.apply(this, [value, true]);
-    }
-
-
-    function verifyText(target, value, isAssert) {
+    function verifyText(target, value, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -169,7 +208,12 @@ module.exports = function(app) {
                     return el.getText();
                 }))
                 .then(checkElement(function(text) {
-                    checkExit(isAssert, text, value);
+                    checkExit(isAssert, text, value, revert);
+                    if (revert) {
+                        ne(text, value);
+                    } else {
+                        eq(text, value);
+                    }
                     eq(text, value);
                     return cb();
                 }), errorHandler(cb));
@@ -319,7 +363,7 @@ module.exports = function(app) {
 
 
 
-    function verifyVisible(target) {
+    function verifyVisible(target, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -333,7 +377,7 @@ module.exports = function(app) {
                     return el.isDisplayed();
                 })
                 .then(function(visibility) {
-                    eq(visibility, true);
+                    assert(visibility, true, null, revert);
                     return cb();
                 }, errorHandler);
         });
@@ -375,7 +419,7 @@ module.exports = function(app) {
 
     }
 
-    function verifyAttribute(target, value, isAssert) {
+    function verifyAttribute(target, value, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -394,8 +438,8 @@ module.exports = function(app) {
                     return el.getAttribute(attr);
                 })
                 .then(function(attr) {
-                    checkExit(isAssert, attr, value);
-                    eq(attr, value);
+                    checkExit(isAssert, attr, value, revert);
+                    assert(attr, value, null, revert);
                     return cb();
                 }, errorHandler);
         });
@@ -448,7 +492,7 @@ module.exports = function(app) {
 
 
 
-    function verifyValue(target, value, isAssert) {
+    function verifyValue(target, value, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -465,8 +509,8 @@ module.exports = function(app) {
                     if (attr === 'cstm_=_empty_=_') {
                         attr = '';
                     }
-                    checkExit(isAssert, attr, value);
-                    eq(attr, value);
+                    checkExit(isAssert, attr, value, revert);
+                    assert(attr, value, null, revert);
                     return cb();
                 }), errorHandler(cb));
 
@@ -484,11 +528,6 @@ module.exports = function(app) {
         return buildHelpers((cb) => {
             return cb();
         });
-    }
-
-
-    function assertText(target, value) {
-        return verifyText.apply(this, [target, value, true]);
     }
 
     function storeCssCount(target, variable) {
@@ -529,7 +568,7 @@ module.exports = function(app) {
 
     }
 
-    function verifyChecked(target, isAssert) {
+    function verifyChecked(target, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -550,8 +589,8 @@ module.exports = function(app) {
                     if (attr !== 'on' && attr !== 'off') {
                         return cb(new Error('Element is not radio or checkbox type'));
                     }
-                    checkExit(isAssert, attr, 'on');
-                    eq(attr, 'on');
+                    checkExit(isAssert, attr, 'on', revert);
+                    assert(attr, 'on', null, revert);
                     return cb();
                 }), errorHandler(cb));
 
@@ -583,12 +622,8 @@ module.exports = function(app) {
 
     }
 
-    function assertValue(target, value) {
-        return verifyValue(target, value, true);
 
-    }
-
-    function verifySelectOptions(target, value) {
+    function verifySelectOptions(target, value, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -610,14 +645,15 @@ module.exports = function(app) {
                         }
                         return value === label;
                     });
-                    eq(some, true, 'Actual value ' + labels.toString() + ' did not match ' + value);
+                    checkExit(isAssert, some, true, revert);
+                    assert(some, true, 'Actual value ' + labels.toString() + (!revert ? ' match ' : ' did not match ') + value, revert);
                     cb();
                 }, errorHandler);
         });
 
     }
 
-    function verifySelectedLabel(target, value) {
+    function verifySelectedLabel(target, value, isAssert, revert) {
         if (finishTest) {
             return finish();
         }
@@ -634,25 +670,21 @@ module.exports = function(app) {
                 })
                 .then(function(label) {
                     if (regexpFunc) {
-                        eq(regexpFunc(value).test(label), true, 'Actual value ' + label + ' did not match ' + value);
+                        checkExit(isAssert, regexpFunc(value).test(label), true, revert);
+                        assert(regexpFunc(value).test(label), true, 'Actual value ' + label + (!revert ? ' match ' : ' did not match ') + value, revert);
+
                         return cb();
                     }
-
-                    eq(label, value);
+                    checkExit(isAssert, label, value, revert);
+                    assert(label, value, null, revert);
                     cb();
                 }, errorHandler);
         });
 
     }
 
-    function verifyNotText() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
-
+    function verifyNotText(target, value, isAssert) {
+        return verifyText(target, value, isAssert, true);
     }
 
     function focus() {
@@ -685,17 +717,8 @@ module.exports = function(app) {
 
     }
 
-    function verifyNotVisible() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
 
-    }
-
-    function verifyNotEditable() {
+    function verifyEditable() {
         if (finishTest) {
             return finish();
         }
@@ -745,15 +768,6 @@ module.exports = function(app) {
 
     }
 
-    function verifyNotAttribute() {
-        if (finishTest) {
-            return finish();
-        }
-        return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
-        });
-
-    }
 
     function getEval() {
         if (finishTest) {
