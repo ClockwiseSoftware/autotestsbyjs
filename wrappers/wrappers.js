@@ -560,12 +560,31 @@ module.exports = function(app) {
 
     }
 
-    function storeSelectOptions() {
+    function storeSelectOptions(target, variable) {
         if (finishTest) {
             return finish();
         }
+        var storedVars = this.storedVars;
         return buildHelpers((cb) => {
-            return cb(new Error('THIS FUNCTION NOT IMPLEMENTED YET'));
+            var by = getBy(target);
+            if (!by) {
+                return byTargetErrorHandler(cb);
+            }
+            driver.findElement(by(target)).then(function(el) {
+                    return el.findElements(By.css('option'));
+                })
+                .then(function(options) {
+                    return options.map(function(option) {
+                        return option.getAttribute('label');
+                    });
+                })
+                .then(function(arr) {
+                    var labels = arr.map(function(a) {
+                        return a['value_'];
+                    });
+                    storedVars[variable] = labels;
+                    cb();
+                }, errorHandler);
         });
 
     }
