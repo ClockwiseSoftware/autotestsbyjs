@@ -55,7 +55,8 @@ function buildDriver() {
         until: sw.until,
         seq: new sw.ActionSequence(driver),
         speed: speed,
-        isNotClose: isNotClose
+        isNotClose: isNotClose,
+        root: __dirname
     };
 }
 
