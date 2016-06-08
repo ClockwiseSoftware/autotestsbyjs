@@ -4,6 +4,9 @@ var browser = process.env.browser;
 var speed = process.env.speed;
 var windowWidth = process.env.windowWidth;
 var windowHeigth = process.env.windowHeigth;
+var isNotClose = process.env.isNotClose;
+
+var d = 'Default';
 
 function buildDriver() {
     var sw = require('selenium-webdriver');
@@ -15,12 +18,20 @@ function buildDriver() {
     var driver = new sw.Builder()
         .forBrowser(browser || 'firefox')
         .build();
-    if (windowWidth) {
-        if (windowHeigth) {
-            windowHeigth = Math.floor(windowWidth / 1.7777777777777777);
+
+    if (!!windowWidth) {
+        if (!windowHeigth) {
+            windowHeigth = Math.floor(+windowWidth / 1.7777777777777777);
         }
-        driver.manage().window().setSize(+windowWidth, windowHeigth);
+        driver.manage().window().setSize(+windowWidth, +windowHeigth);
     }
+
+    describe('INFO', function() {
+        it('Browser: ' + browser);
+        it('Speed: ' + (speed || d));
+        it('Width: ' + (windowWidth || d));
+        it('Height: ' + (windowHeigth || d));
+    });
 
     function waiter(time) {
         var x = false;
@@ -42,8 +53,10 @@ function buildDriver() {
         waiter: waiter,
         By: sw.By,
         until: sw.until,
-        seq: sw.ActionSequence,
-        speed: speed
+        seq: new sw.ActionSequence(driver),
+        speed: speed,
+        isNotClose: isNotClose,
+        root: __dirname
     };
 }
 

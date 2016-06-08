@@ -1,35 +1,155 @@
 #LIST OF COMMAND NAMES
 
-- verifyElementPresent
-- storeText
+- store
 - echo
-- storeEval
+- setSpeed
+- open
+- assertTitle
+- pause
+- verifyElementPresent
 - verifyText
-- verifyVisible
+- mouseOver
+- runScript
+- clickAndWait
+- verifyAttribute
+- verifyNotAttribute
+- storeEval
+- getEval
+- click
+- verifyEval
+- waitForElementPresent
+- mouseOut
+- verifyLocation
+- sendKeys
+- verifyValue
+- selectFrame
+- type
+- selectWindow
+- verifyTitle
+- close
+- verifyElementNotPresent
+- waitForText
+- goBackAndWait
 
 
 #LIST OF COMMANDS
 
 ```js
-cmd.verifyElementPresent("target", "value").wait(1000).end(done);
+cmd.store("target", "value").end(done);
 ```
 
 ```js
-cmd.storeText("target", "value").wait(1000).end(done);
+cmd.echo("target", "value").end(done);
 ```
 
 ```js
-cmd.echo("target", "value").wait(1000).end(done);
+cmd.setSpeed("target", "value").end(done);
 ```
 
 ```js
-cmd.storeEval("target", "value").wait(1000).end(done);
+cmd.open("target", "value").end(done);
 ```
 
 ```js
-cmd.verifyText("target", "value").wait(1000).end(done);
+cmd.assertTitle("target", "value").end(done);
 ```
 
 ```js
-cmd.verifyVisible("target", "value").wait(1000).end(done);
+cmd.pause("target", "value").end(done);
+```
+
+```js
+cmd.verifyElementPresent("target", "value").end(done);
+```
+
+```js
+cmd.verifyText("target", "value").end(done);
+```
+
+```js
+cmd.mouseOver("target", "value").end(done);
+```
+
+```js
+cmd.runScript("target", "value").end(done);
+```
+
+```js
+cmd.clickAndWait("target", "value").end(done);
+```
+
+```js
+cmd.verifyAttribute("target", "value").end(done);
+```
+
+```js
+cmd.verifyNotAttribute("target", "value").end(done);
+```
+
+```js
+cmd.storeEval("target", "value").end(done);
+```
+
+```js
+cmd.getEval("target", "value").end(done);
+```
+
+```js
+cmd.click("target", "value").end(done);
+```
+
+```js
+cmd.verifyEval("target", "value").end(done);
+```
+
+```js
+cmd.waitForElementPresent("target", "value").end(done);
+```
+
+```js
+cmd.mouseOut("target", "value").end(done);
+```
+
+```js
+cmd.verifyLocation("target", "value").end(done);
+```
+
+```js
+cmd.sendKeys("target", "value").end(done);
+```
+
+```js
+cmd.verifyValue("target", "value").end(done);
+```
+
+```js
+cmd.selectFrame("target", "value").end(done);
+```
+
+```js
+cmd.type("target", "value").end(done);
+```
+
+```js
+cmd.selectWindow("target", "value").end(done);
+```
+
+```js
+cmd.verifyTitle("target", "value").end(done);
+```
+
+```js
+cmd.close("target", "value").end(done);
+```
+
+```js
+cmd.verifyElementNotPresent("target", "value").end(done);
+```
+
+```js
+cmd.waitForText("target", "value").end(done);
+```
+
+```js
+cmd.goBackAndWait("target", "value").end(done);
 ```

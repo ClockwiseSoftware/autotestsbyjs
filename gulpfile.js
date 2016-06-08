@@ -6,12 +6,33 @@ var args = require('get-gulp-args')();
 var openBrowser = require('gulp-open');
 var parser = require('./parser/parser');
 
+var isReport = args.report;
+
 function testRunner(browser) {
-    var speed = args.speed || null;
-    var width = args.w || null;
-    var heigth = args.h || null;
+    var speed = args.speed;
+    var width = args.ww;
+    var heigth = args.wh;
+    var isNotClose = args.show;
+    var envObject = {
+        browser: browser,
+        isNotClose: isNotClose
+    };
+
+    if (width) {
+        envObject.windowWidth = width;
+    }
+
+    if (heigth) {
+        envObject.windowHeigth = heigth;
+    }
+
+
+    if (speed) {
+        envObject.speed = speed;
+    }
+
     return function(done) {
-        var env = processEnv({ browser: browser, speed: speed, windowWidth: width, windowHeigth: heigth });
+        var env = processEnv(envObject);
         return gulp.src('index.js', {
                 read: false
             })
@@ -20,11 +41,12 @@ function testRunner(browser) {
                 reporter: 'mochawesome'
             }))
             .on('end', function() {
-
-                return gulp
-                    .src('./mochawesome-reports/mochawesome.html')
-                    .pipe(openBrowser())
-                    .on('end', done);
+                if (isReport) {
+                    return gulp
+                        .src('./mochawesome-reports/mochawesome.html')
+                        .pipe(openBrowser())
+                        .on('end', done);
+                }
             });
     };
 }

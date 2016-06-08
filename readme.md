@@ -24,54 +24,46 @@ gulp chrome
 #ie,opera,edge,safari
 
 gulp chrome --speed 2000 
-gulp chrome --speed 2000 -w 1024
-gulp chrome --speed 2000 -w 1024 -h 720
+gulp chrome --speed 2000 -ww 1024
+gulp chrome --speed 2000 -ww 1024 -wh 720
+gulp chrome --speed 2000 -ww 1024 -wh 720 --show
+gulp chrome --speed 2000 -ww 1024 -wh 720 --show --report
 
 ```
 
-where `--speed 2000` in (ms) `-w 1024` window width and `-h 720` window heigth
+where `--speed 2000` in (ms) `--ww 1024` window width,  `--wh 720` window heigth, `--show` not close browser after test ends and `--report` open browser window with tests report after tests end;
 
 
 ###Structure
 
 ```bash
 /index.js # - start point of testing, also includes all tests, and libraries
-/tests/ # - folder contains tests packs
-/tests/index.js # - point includes all test cases folders in folder tests
-/tests/{test_pack_name}/ # - test cases folder
-/tests/{test_pack_name}/index.js # - point of test cases in this folder
-/tests/{test_pack_name}/{test_case_name}.js # - single test case
+/tests/ # - folder contains tests
+/tests/{test_case_name}.js # - single test case
+
+/suites/ # - folder with has test suites
+/suites/{test_suite_name}.js # - suite which run pack of test cases 
 ```
 
 
 ###Generator
 ```bash
-node gen.js foldername filename
+node gen.js filename
 ```
 
-it will create `/tests/{foldername}/{filename}.js`
+it will create `/tests/{filename}.js`
 
 ###Parser
-All source files of seleniun should be contained in /selenium_id_src
-also this folder could contatain sub folders of level 2
+All source files of selenium should be contained in `/selenium_id_src`
+All source files of selenium suites should be contained in `/selenium_id_suites`
 
-`/selenium_id_src/one`
-
-`/selenium_id_src/two`
-
-`/selenium_id_src/two/three` - <--- wrong --->
-
-files of seleniums source should be format html
+files of seleniums source should be of format `HTML`
 
 For parse all folsers use `gulp parse --all`;
 
 For parse single file use `gulp parse --file {file_name}` in folder /selenium_id_src/ without file format (.html)
 
-or
-
-`gulp parse --file {file_name} --folder {folder_name}` in sub folder (`/selenium_id_src/{folder_name}`)
-
-All parsed files would be contained in tests/ folder and if there are subfolder in sub folders `(/test/one/, /test/two/)` and would be called the same name like source file with low dash( `_` ) separator .js
+All parsed files would be contained in tests/ folder and would be called the same name like source file with low dash( `_` ) separator .js
 
 ###EXAMPLE of test
 ```js
