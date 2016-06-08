@@ -65,10 +65,10 @@ function Parser(name, folder, isSuite) {
 
     function readAndGenerate(file, done) {
         var name = fsops.getModuleName(file, 1);
+        console.log(name);
 
         var dest = isSuite ? dirSuitesDest : dirDest;
         var destTest = dirDest;
-
 
 
         fs.readFile(file, 'utf8', (err, data) => {
@@ -76,6 +76,7 @@ function Parser(name, folder, isSuite) {
                 console.log(err);
             }
             var parsed = isSuite ? parserSuites(data, name, destTest) : parserTests(data, snakeCase(name.replace('.html', '')) + '.js');
+
             var newTest = isSuite ? template.suites(parsed) : template.tests(parsed);
             if (!isSuite) {
                 commandList = commandList.concat(parsed.tests);
@@ -151,7 +152,7 @@ function Parser(name, folder, isSuite) {
                 return;
             }
 
-            console.log(file + ' has been saved');
+          //  console.log(file + ' has been saved');
             if (done) {
                 done();
             }
@@ -160,7 +161,6 @@ function Parser(name, folder, isSuite) {
 
     function generate(testFile, name, dest, done) {
         name = snakeCase(name);
-        console.log(name, dest);
         fs.exists(dest, function(exists) {
             if (exists) {
                 var filename = dest + '/' + name + '.js';
@@ -212,6 +212,10 @@ process.argv
     });
 if (o.name) {
     Parser(o.name, o.folder);
+}
+
+function snakeCase(value){
+    return value.replace(/\ /g, '_').replace(/\\/g,'\\\\');
 }
 
 function snakeCase(value){

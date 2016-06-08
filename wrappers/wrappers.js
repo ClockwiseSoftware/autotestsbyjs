@@ -333,6 +333,7 @@ module.exports = function(app) {
 
     function setBaseUrl(url) {
         this.baseUrl = url || '';
+        console.log(url);
     }
 
     function assert(actualy, expected, message, revert) {
@@ -350,11 +351,12 @@ module.exports = function(app) {
         url = parseStoredVars(url, this.storedVars);
         time = time || 2000;
         var baseUrl = this.baseUrl || '';
-
+            console.log(baseUrl);
         if (finishTest) {
             return finish();
         }
         return buildHelpers((cb) => {
+            console.log(baseUrl);
             return driver.get(baseUrl + url).then(() => {
                 return wait(time)(cb);
             });

@@ -19,9 +19,11 @@ function filepathGetter(dir) {
 
 function getModuleName(path, len) {
     var filename = path.split('/');
+
     if (filename.length === 1) {
         filename = path.split('\\');
     }
+
     return filename[filename.length - len];
 }
 
